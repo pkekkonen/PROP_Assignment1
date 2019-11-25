@@ -19,19 +19,23 @@ myObject.call = function(funcName, parameters) {
 
 	//TODO: gör koll om prototypes lista finns 
 	this.prototypes.forEach(proto => {
+			var parentProtos = getParentPrototypes(proto);
+
 			if(proto.hasOwnProperty(funcName) && typeOf(proto.funcName === 'function')) { //förutsätter att funcname är inskickad som String
-				
+				return //vadå?
 			} else {
 				var parentProto = proto.__proto__;
 				while(parentProto != null) {
 					if(parentProto.hasOwnProperty(funcName) && typeof(parentProto.funcName === 'function')) {
-						
+						return //vadå?
 						//break;
 					} else {
 						
-					parentProto = parentProto.__proto__;
+						parentProto = parentProto.__proto__;
 					}
 				}
+
+				//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
 
 			}
 			//kolla om proto har funktionen
@@ -40,3 +44,15 @@ myObject.call = function(funcName, parameters) {
 	);
 
 };
+
+//måste vi kolla typen? Checka att proto verkligen är en object??
+getParentPrototypes = function(proto) { 
+	var parentProtos = [];
+
+	while(proto.__proto__ != null) {
+		if(typeof(proto.__proto__) === myObject) 
+			parentProtos.push(proto.__proto__);
+	}
+
+	return parentProtos;
+}
