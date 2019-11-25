@@ -16,9 +16,15 @@ myObject.create = function(prototypeList) {
 myObject.call = function(funcName, parameters) {
 	//börjar söka igenom element 0 i protoypes, sedan dess grand-prototypes
 	//finns den inte i det ledet så rör vi oss till element 1 etc.
-
+	search(this.prototypes);
 	//TODO: gör koll om prototypes lista finns 
-	this.prototypes.forEach(currentProto => {
+
+
+};
+
+
+search = function(protos) {
+	protos.forEach(currentProto => {
 			var parentProtos = getParentPrototypes(currentProto);
 
 			if(proto.hasOwnProperty(funcName) && typeOf(currentProto.funcName) === 'function') { //förutsätter att funcname är inskickad som String
@@ -30,16 +36,24 @@ myObject.call = function(funcName, parameters) {
 						//break;
 					}
 				});
-				parentProtos[parentProtos-1]
+
 				//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
+				var i = parentProtos.length;
+				do{ 
+					i--;
+					lastParenProto = parentProtos[i];
+				} while (typeOf(lastParenProto) !== myObject  && i !== 0);
+
+				search(lastParenProto.prototypes);
+				//rekursivt anrop
 
 			}
 			//kolla om proto har funktionen
 			//om inte så leta uppåt i dess prototyper
 		}
 	);
+}
 
-};
 
 //måste vi kolla typen? Checka att proto verkligen är en object??
 getParentPrototypes = function(proto) { 
