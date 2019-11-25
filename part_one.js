@@ -8,6 +8,7 @@ var myObject = {
 
 myObject.create = function(prototypeList) {
 	prototypeList = prototypes;
+	// variabler? hittas inte i prototyp
 
 };
 
@@ -15,26 +16,21 @@ myObject.create = function(prototypeList) {
 myObject.call = function(funcName, parameters) {
 	//börjar söka igenom element 0 i protoypes, sedan dess grand-prototypes
 	//finns den inte i det ledet så rör vi oss till element 1 etc.
-	funcNameFound = false;
 
 	//TODO: gör koll om prototypes lista finns 
-	this.prototypes.forEach(proto => {
-			var parentProtos = getParentPrototypes(proto);
+	this.prototypes.forEach(currentProto => {
+			var parentProtos = getParentPrototypes(currentProto);
 
-			if(proto.hasOwnProperty(funcName) && typeOf(proto.funcName === 'function')) { //förutsätter att funcname är inskickad som String
+			if(proto.hasOwnProperty(funcName) && typeOf(currentProto.funcName) === 'function') { //förutsätter att funcname är inskickad som String
 				return //vadå?
 			} else {
-				var parentProto = proto.__proto__;
-				while(parentProto != null) {
-					if(parentProto.hasOwnProperty(funcName) && typeof(parentProto.funcName === 'function')) {
+				parentProtos.forEach(currentParentProto =>{
+					if(parentProto.hasOwnProperty(funcName) && typeof(parentProto.funcName) === 'function') {
 						return //vadå?
 						//break;
-					} else {
-						
-						parentProto = parentProto.__proto__;
 					}
-				}
-
+				});
+				parentProtos[parentProtos-1]
 				//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
 
 			}
@@ -50,7 +46,6 @@ getParentPrototypes = function(proto) {
 	var parentProtos = [];
 
 	while(proto.__proto__ != null) {
-		if(typeof(proto.__proto__) === myObject) 
 			parentProtos.push(proto.__proto__);
 	}
 
