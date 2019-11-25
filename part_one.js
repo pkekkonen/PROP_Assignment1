@@ -13,5 +13,29 @@ myObject.create = function(prototypeList) {
 
 
 myObject.call = function(funcName, parameters) {
+	//börjar söka igenom element 0 i protoypes, sedan dess grand-prototypes
+	//finns den inte i det ledet så rör vi oss till element 1 etc.
+	funcNameFound = false;
+
+	//TODO: gör koll om prototypes lista finns 
+	this.prototypes.forEach(proto => {
+		while(!funcNameFound) {
+			if(proto.hasOwnProperty(funcName) && typeOf(proto.funcName === 'function')) { //förutsätter att funcname är inskickad som String
+
+			} else {
+				var parentProto = proto.__proto__;
+				while(parentProto != null) {
+					if(parentProto.hasOwnProperty(funcName)) {
+						//break;
+					}
+
+					parentProto = proto.__proto__;
+				}
+
+			}
+			//kolla om proto har funktionen
+			//om inte så leta uppåt i dess prototyper
+		}
+	};);
 
 };
