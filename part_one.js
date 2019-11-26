@@ -42,37 +42,47 @@ myObject.call = function(funcName, parameters) {
 };
 
 myObject.addPrototype = function(obj){
-	console.log(this.prototypes)
 	this.prototypes.push(obj);
 
 }
 
 search = function(protos, funcName, parameters) {
-
+	var visitedObjects = [];
 	if(protos === undefined || protos === null)
 		return undefined;
 
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
+		visitedObjects.push(currentProto);
 
-		if(currentProto.hasOwnProperty(funcName)) { 
-			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-			var result = currentProto[funcName](parameters);
-			if(result !== undefined)
-				return result;
-		} else {
-			if(currentProto.hasOwnProperty("prototypes")) {
-				var result = search(currentProto.prototypes, funcName, parameters);
-				if(result !== undefined) {
+		if(!contains(visitedObjects, currentProto)) {
+
+			if(currentProto.hasOwnProperty(funcName)) { 
+				//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
+				var result = currentProto[funcName](parameters);
+				if(result !== undefined)
 					return result;
+			} else {
+				if(currentProto.hasOwnProperty("prototypes")) {
+					var result = search(currentProto.prototypes, funcName, parameters);
+					if(result !== undefined) {
+						return result;
+					}
 				}
-			}
 
+			}
 		}
 	}
 	return undefined;
 }
 
+contains = function(list, obj) {
+	for(var i = 0; i < list.length; i++) {
+		if(list[i] === obj)
+			return true;
+	}
+	return false;
+}
 
 //TESTKOD
 var obj0 = myObject.create(null);
