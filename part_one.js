@@ -21,13 +21,17 @@ myObject.create = function(prototypeList) {
 myObject.call = function(funcName, parameters) {
 	//börjar söka igenom element 0 i protoypes, sedan dess grand-prototypes
 	//finns den inte i det ledet så rör vi oss till element 1 etc.
+
+	//ska först kolla i själva objektet man anropar med
+	if(myObject.hasOwnProperty(funcName))
+		return myObject[funcName](parameters);
+
 	return search(this.prototypes,funcName, parameters);
 	//TODO: gör koll om prototypes lista finns. Fast vad menar jag med det för den måste väl finnas eftersom myObject är en prototyp till objektet 
 };
 
 search = function(protos, funcName, parameters) {
 
-	//ska först kolla i själva objektet man anropar med
 	if(protos === undefined)
 		return undefined;
 	for(var i = 0; i < protos.length; i++) {
