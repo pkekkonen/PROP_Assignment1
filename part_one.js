@@ -28,34 +28,36 @@ myObject.call = function(funcName, parameters) {
 search = function(protos, funcName, parameters) {
 
 	//ska först kolla i själva objektet man anropar med
+	if(protos === undefined)
+		return undefined;
 	for(var i = 0; i < protos.length; i++) {
 			var currentProto = protos[i];
 			var parentProtos = getParentPrototypes(currentProto);
 
 			if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
 				//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-				console.log("här ");
 				return currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
 			} else {
-				parentProtos.forEach(currentParentProto =>{
-
-					if(parentProto.hasOwnProperty(funcName)) {
+				for(var j = 0; j < parentProtos.length; j++){
+					var currentParentProto = parentProtos[j];
+					if(currentParentProto.hasOwnProperty(funcName)) {
 						//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-						return parentProto[funcName](parameters);
+						return currentParentProto[funcName](parameters);
 					}
-				});
+				}
 				//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
-				var i = parentProtos.length;
-				do{ 
-					i--;
-					lastParenProto = parentProtos[i];
-				} while (lastParentProto.__proto__ !== myObject  && i !== 0);
-
-				var result = search(lastParenProto.prototypes);
-				if(result !== undefined)
-					return result;
+				var k = parentProtos.length;
+				var lastParentProto = {};
+				while (lastParentProto.__proto__ !== myObject  && k !== 0) {
+					k--;
+					lastParentProto = parentProtos[k];
+				}
+				if(lastParentProto !== undefined) {
+					var result = search(lastParentProto.prototypes, funcName, parameters);
+					if(result !== undefined)
+						return result;
 				//om den är undefined så betyder det att den aldrig hittade någon funktion i det rekursiva anropet och det betyder att vi ska röra oss till nästa element i prototypesList
-
+				}
 			}
 			//kolla om proto har funktionen
 			//om inte så leta uppåt i dess prototyper
@@ -76,18 +78,13 @@ getParentPrototypes = function(proto) {
 	return parentProtos;
 }
 
-var obj1 = {};
-obj1.hej = function() {console.log("hej")};
-var obj2 = {};
-obj2.hej = function() {console.log("hello")};
-var obj3 = myObject.create([obj2]);
-obj3.hej = function() {console.log("hola")};
-var result = obj3.call("hej", []);
-
-console.log();
-console.log("NEXT");
-var obj4 = myObject.create([obj1, obj2, obj3]);
-var result = obj4.call("hej", []);
+var obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+var obj1 = myObject.create([obj0]);
+var obj2 = myObject.create([]);
+obj2.func = function(arg) { return "func2: " + arg; };
+var obj3 = myObject.create([obj1, obj2]);
+var result = obj3.call("func", ["hello"]);
 
 
 
