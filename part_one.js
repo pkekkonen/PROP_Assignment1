@@ -59,11 +59,13 @@ search = function(protos, funcName, parameters) {
 			//här rör vi oss ett steg nedåt
 			var k = parentProtos.length-1;
 			var lastParentProto = {};
-			while (lastParentProto.__proto__ !== myObject  && k >= 0) {
+			while (!(lastParentProto.hasOwnProperty("prototypes")) && k >= 0) {
+				console.log(currentProto);
 				lastParentProto = parentProtos[k];
 				k--;
 			}
-			if(lastParentProto !== myObject && lastParentProto !== undefined) {
+
+			if(lastParentProto.hasOwnProperty("prototypes") && lastParentProto !== undefined) {
 
 				var result = search(lastParentProto.prototypes, funcName, parameters);
 
@@ -73,8 +75,9 @@ search = function(protos, funcName, parameters) {
 			//om den är undefined så betyder det att den aldrig hittade någon funktion i det rekursiva anropet och det betyder att vi ska röra oss till nästa element i prototypesList
 			}
 
-			if(currentProto.__proto__ === myObject) {
-				var result = search(currentProto.prototypes, funcName, parameters);
+			//kolla om objektets prototyp har en prototyp lista
+			if(currentProto.__proto__.hasOwnProperty("prototypes")) { 
+				var result = search(currentProto.__proto__.prototypes, funcName, parameters);
  				if(result != undefined)
  					return result;
 			}
@@ -99,6 +102,14 @@ getParentPrototypes = function(proto) {
 	return parentProtos;
 }
 
+function isEmpty(obj) {
+    for(var prop in obj) {
+        if(obj.hasOwnProperty(prop))
+            return false;
+    }
+
+    return true;
+}
 
 //TESTKOD
 var obj0 = myObject.create(null);
@@ -124,7 +135,20 @@ result = obj0.call("func", ["hello"]);
 console.log("should print ’func0: hello’ ->", result);
 
 
+//Circular
+//var obj0 = myObject.create(null);
+//var obj1 = myObject.create([obj0]);
+//obj0.addPrototype(obj1);
 
+//Test 
+obj9 = {};
+obj9.funcy = function() {console.log("hallå");};
+
+obj0 = myObject.create([obj9]);
+obj1 = {};
+obj1.func = function() {console.log("heeeej");};
+obj2 = obj0.create([obj1]);
+obj2.call("funcy", []);
 
 
 
