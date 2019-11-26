@@ -21,10 +21,9 @@ myObject.create = function(prototypeList) {
 myObject.call = function(funcName, parameters) {
 	//börjar söka igenom element 0 i protoypes, sedan dess grand-prototypes
 	//finns den inte i det ledet så rör vi oss till element 1 etc.
-	search(this.prototypes,funcName, parameters);
+	return search(this.prototypes,funcName, parameters);
 	//TODO: gör koll om prototypes lista finns. Fast vad menar jag med det för den måste väl finnas eftersom myObject är en prototyp till objektet 
 };
-
 
 search = function(protos, funcName, parameters) {
 
@@ -33,22 +32,20 @@ search = function(protos, funcName, parameters) {
 		return undefined;
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
-		console.log("CURRENT   " + currentProto.na);
 
 		var parentProtos = getParentPrototypes(currentProto);
-		console.log(parentProtos);
-		console.log();
 
+
+		//vi måste se till att gå igenom dess listas lista
 		if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-			console.log("FIRST ONE     " + currentProto.na);
-			return currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
+			var result = currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
+			return result;
 		} else {
 			for(var j = 0; j < parentProtos.length; j++){
 				var currentParentProto = parentProtos[j];
 				if(currentParentProto.hasOwnProperty(funcName)) {
 					//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-					console.log("Second ONE")
 					return currentParentProto[funcName](parameters);
 				}
 			}
@@ -57,22 +54,27 @@ search = function(protos, funcName, parameters) {
 			var lastParentProto = {};
 			while (lastParentProto.__proto__ !== myObject  && k >= 0) {
 				lastParentProto = parentProtos[k];
-				console.log("HÄÄÄÄääÄÄär   " + lastParentProto.na);
 				k--;
 			}
-			if(lastParentProto !== undefined) {
+			if(lastParentProto !== myObject && lastParentProto !== undefined) {
+
 				var result = search(lastParentProto.prototypes, funcName, parameters);
+
 				if(result !== undefined) {
-					console.log("THIRD ONE")
 					return result;
 				}
 			//om den är undefined så betyder det att den aldrig hittade någon funktion i det rekursiva anropet och det betyder att vi ska röra oss till nästa element i prototypesList
+			}
+
+			if(currentProto.__proto__ === myObject) {
+				var result = search(currentProto.prototypes, funcName, parameters);
+ 				if(result != undefined)
+ 					return result;
 			}
 		}
 		//kolla om proto har funktionen
 		//om inte så leta uppåt i dess prototyper
 	}
-	console.log("FOURTH ONE")
 
 	return undefined;
 }
@@ -82,16 +84,9 @@ search = function(protos, funcName, parameters) {
 getParentPrototypes = function(proto) { 
 	var parentProtos = [];
 
-console.log("PROTO   :::" + proto.na);
-
 	while(proto.__proto__ != null) {
 		proto = proto.__proto__;
 		parentProtos.push(proto);
-		if(proto === myObject) {
-			console.log("JAG ÄR EN MYOBJECT");
-		}
-		console.log("PARENTS      " + proto.na);
-
 	}
 
 	return parentProtos;
@@ -110,7 +105,7 @@ var obj3 = myObject.create([obj1, obj2]);
 obj3.na = "obj3";
 var result = obj3.call("func", ["hello"]);
 
-
+console.log("RESULT  " + result);
 
 
 
