@@ -1,9 +1,13 @@
-//create a object myObject with create method
-//call(funkName, parametee
+
+
+
+
+//tror vi  har tänkt fel ang. prototyperna. Tror att vi (möjligtvis jag ...) förvirrat till det för oss själva.
+//tror att vårat sätt (det sätt beskrivet av uppgiften) ska ersätta det existerande sättet, dvs. den existerande implemenatationen av prototyper
+// Object ska också ligga som proto i vår lista?
 
 var myObject = {};
 
-//måste se till att myObject blir proto till objektet som anropar den
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
 
@@ -11,105 +15,45 @@ myObject.create = function(prototypeList) {
 	obj.prototypes = prototypeList;
 	return obj;
 
-	//this berör myObject objektet, inte objektet som anropade den
-
 	// variabler? hittas inte i prototyp
 
 };
 
-//vad ska denna returna om inte function finns?
 //måste vi kolla att parametrarna stämmer (antalsmässigt etc)
 myObject.call = function(funcName, parameters) {
-	//börjar söka igenom element 0 i protoypes, sedan dess grand-prototypes
-	//finns den inte i det ledet så rör vi oss till element 1 etc.
 
-	//ska först kolla i själva objektet man anropar med
 	if(this.hasOwnProperty(funcName)) 
 		return this[funcName](parameters);
 
 	return search(this.prototypes,funcName, parameters);
-	//TODO: gör koll om prototypes lista finns. Fast vad menar jag med det för den måste väl finnas eftersom myObject är en prototyp till objektet 
 };
 
 search = function(protos, funcName, parameters) {
 
-	//om den inte har några prototyper i x-led så måste vi fortfarande kolla dess prototyper i y-led
 	if(protos === undefined || protos === null)
 		return undefined;
+	
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
 
-		var parentProtos = getParentPrototypes(currentProto);
-
-
-		//vi måste se till att gå igenom dess listas lista
-		if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
+		if(currentProto.hasOwnProperty(funcName)) { 
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-			var result = currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
-			return result;
+			var result = currentProto[funcName](parameters);
+			if(result !== undefined)
+				return result;
 		} else {
-			for(var j = 0; j < parentProtos.length; j++){
-				var currentParentProto = parentProtos[j];
-				if(currentParentProto.hasOwnProperty(funcName)) {
-					//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-					return currentParentProto[funcName](parameters);
+			if(currentProto.hasOwnProperty("prototypes")) {
+				var result = search(currentProto.prototypes, funcName, parameters);
+					if(result !== undefined) {
+						return result;
 				}
 			}
-			//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
-			//här rör vi oss ett steg nedåt
-			var k = parentProtos.length-1;
-			var lastParentProto = {};
-			while (!(lastParentProto.hasOwnProperty("prototypes")) && k >= 0) {
-				console.log(currentProto);
-				lastParentProto = parentProtos[k];
-				k--;
-			}
 
-			if(lastParentProto.hasOwnProperty("prototypes") && lastParentProto !== undefined) {
-
-				var result = search(lastParentProto.prototypes, funcName, parameters);
-
-				if(result !== undefined) {
-					return result;
-				}
-			//om den är undefined så betyder det att den aldrig hittade någon funktion i det rekursiva anropet och det betyder att vi ska röra oss till nästa element i prototypesList
-			}
-
-			//kolla om objektets prototyp har en prototyp lista
-			if(currentProto.__proto__.hasOwnProperty("prototypes")) { 
-				var result = search(currentProto.__proto__.prototypes, funcName, parameters);
- 				if(result != undefined)
- 					return result;
-			}
 		}
-		//kolla om proto har funktionen
-		//om inte så leta uppåt i dess prototyper
 	}
-
 	return undefined;
 }
 
-//måste vi kolla typen? Checka att proto verkligen är en object??
-//prototypes
-getParentPrototypes = function(proto) { 
-	var parentProtos = [];
-
-	while(proto.__proto__ != null) {
-		proto = proto.__proto__;
-		parentProtos.push(proto);
-	}
-
-	return parentProtos;
-}
-
-function isEmpty(obj) {
-    for(var prop in obj) {
-        if(obj.hasOwnProperty(prop))
-            return false;
-    }
-
-    return true;
-}
 
 //TESTKOD
 var obj0 = myObject.create(null);
@@ -147,7 +91,7 @@ obj9.funcy = function() {console.log("hallå");};
 obj0 = myObject.create([obj9]);
 obj1 = {};
 obj1.func = function() {console.log("heeeej");};
-obj2 = obj0.create([obj1]);
+obj2 = obj0.create([obj0]);
 obj2.call("funcy", []);
 
 
