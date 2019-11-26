@@ -31,37 +31,44 @@ search = function(protos, funcName, parameters) {
 	if(protos === undefined)
 		return undefined;
 	for(var i = 0; i < protos.length; i++) {
-			var currentProto = protos[i];
-			var parentProtos = getParentPrototypes(currentProto);
+		var currentProto = protos[i];
 
-			if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
-				//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-				return currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
-			} else {
-				for(var j = 0; j < parentProtos.length; j++){
-					var currentParentProto = parentProtos[j];
-					if(currentParentProto.hasOwnProperty(funcName)) {
-						//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-						return currentParentProto[funcName](parameters);
-					}
-				}
-				//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
-				var k = parentProtos.length;
-				var lastParentProto = {};
-				while (lastParentProto.__proto__ !== myObject  && k !== 0) {
-					k--;
-					lastParentProto = parentProtos[k];
-				}
-				if(lastParentProto !== undefined) {
-					var result = search(lastParentProto.prototypes, funcName, parameters);
-					if(result !== undefined)
-						return result;
-				//om den är undefined så betyder det att den aldrig hittade någon funktion i det rekursiva anropet och det betyder att vi ska röra oss till nästa element i prototypesList
+		var parentProtos = getParentPrototypes(currentProto);
+
+
+		if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
+			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
+			console.log("FIRST ONE     " + currentProto.name);
+			return currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
+		} else {
+			for(var j = 0; j < parentProtos.length; j++){
+				var currentParentProto = parentProtos[j];
+				if(currentParentProto.hasOwnProperty(funcName)) {
+					//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
+					console.log("Second ONE")
+					return currentParentProto[funcName](parameters);
 				}
 			}
-			//kolla om proto har funktionen
-			//om inte så leta uppåt i dess prototyper
+			//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
+			var k = parentProtos.length-1;
+			var lastParentProto = {};
+			while (lastParentProto.__proto__ !== myObject  && k !== 0) {
+				lastParentProto = parentProtos[k];
+				k--;
+			}
+			if(lastParentProto !== undefined) {
+				var result = search(lastParentProto.prototypes, funcName, parameters);
+				if(result !== undefined) {
+					console.log("THIRD ONE")
+					return result;
+				}
+			//om den är undefined så betyder det att den aldrig hittade någon funktion i det rekursiva anropet och det betyder att vi ska röra oss till nästa element i prototypesList
+			}
+		}
+		//kolla om proto har funktionen
+		//om inte så leta uppåt i dess prototyper
 	}
+	console.log("FOURTH ONE")
 
 	return undefined;
 }
@@ -80,10 +87,14 @@ getParentPrototypes = function(proto) {
 
 var obj0 = myObject.create(null);
 obj0.func = function(arg) { return "func0: " + arg; };
+obj0.name = "obj0";
 var obj1 = myObject.create([obj0]);
+obj1.name = "obj1";
 var obj2 = myObject.create([]);
+obj2.name = "obj2";
 obj2.func = function(arg) { return "func2: " + arg; };
 var obj3 = myObject.create([obj1, obj2]);
+obj3.name = "obj3";
 var result = obj3.call("func", ["hello"]);
 
 
