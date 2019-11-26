@@ -32,9 +32,11 @@ search = function(protos, funcName, parameters) {
 		return undefined;
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
+		console.log("CURRENT   " + currentProto.name);
 
 		var parentProtos = getParentPrototypes(currentProto);
-
+		console.log(parentProtos);
+		console.log();
 
 		if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
@@ -52,7 +54,7 @@ search = function(protos, funcName, parameters) {
 			//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
 			var k = parentProtos.length-1;
 			var lastParentProto = {};
-			while (lastParentProto.__proto__ !== myObject  && k !== 0) {
+			while (lastParentProto.__proto__ !== myObject  && k >= 0) {
 				lastParentProto = parentProtos[k];
 				k--;
 			}
