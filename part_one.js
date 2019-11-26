@@ -1,3 +1,6 @@
+//obj0.addPrototype(obj1);
+//The last line above should generate an error, since it would cause circular inheritance
+//så vi ska preventa att man kan lägga till detta. Det ska inte få ske. Snarare än att det ska få ske och vi måste städa upp konsekvenserna så ska vi förebygga det istället
 
 
 // https://ilearn2.dsv.su.se/mod/forum/discuss.php?d=61506
@@ -47,42 +50,32 @@ myObject.addPrototype = function(obj){
 }
 
 search = function(protos, funcName, parameters) {
-	var visitedObjects = [];
+
 	if(protos === undefined || protos === null)
 		return undefined;
 
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
-		visitedObjects.push(currentProto);
 
-		if(!contains(visitedObjects, currentProto)) {
-
-			if(currentProto.hasOwnProperty(funcName)) { 
-				//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-				var result = currentProto[funcName](parameters);
-				if(result !== undefined)
+		if(currentProto.hasOwnProperty(funcName)) { 
+			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
+			var result = currentProto[funcName](parameters);
+			if(result !== undefined)
+				return result;
+		} else {
+			if(currentProto.hasOwnProperty("prototypes")) {
+				var result = search(currentProto.prototypes, funcName, parameters);
+				if(result !== undefined) {
 					return result;
-			} else {
-				if(currentProto.hasOwnProperty("prototypes")) {
-					var result = search(currentProto.prototypes, funcName, parameters);
-					if(result !== undefined) {
-						return result;
-					}
 				}
-
 			}
+
 		}
 	}
 	return undefined;
 }
 
-contains = function(list, obj) {
-	for(var i = 0; i < list.length; i++) {
-		if(list[i] === obj)
-			return true;
-	}
-	return false;
-}
+
 
 //TESTKOD
 var obj0 = myObject.create(null);
@@ -114,9 +107,6 @@ var obj1 = myObject.create([obj0]);
 
 obj0.addPrototype(obj1);
 var obj2 = myObject.create([obj0]);
-obj0.name = "obj0";
-obj1.name = "obj1";
-obj2.name = "obj2";
 
 result = obj2.call("func", ["hello"]);
 console.log("should print ’undefined ->", result);
