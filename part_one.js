@@ -1,6 +1,18 @@
 
 
+// https://ilearn2.dsv.su.se/mod/forum/discuss.php?d=61506
+// "...I conclude that you can get the grade Ok if you don't try to prevent changes after creation, but to get the grade Good if you do." 
+//( ^ regarding changing the prototypes list. vi måste förhindra att man kan göra det )
+//"...What you could have done to solve this is implement your own kind of collection tailored to have "prototype-list" behaviour."
 
+//Ang. circular behaviour
+// https://ilearn2.dsv.su.se/mod/forum/discuss.php?d=31807
+//"The text "Circular Inheritance Prevention" in the Assignment 1 text is misleading, it should be "Circular Inheritance Detection".
+// The text should be: 
+//Circular Inheritance Detection
+//There is a risk for circular inheritance both with prototype-based and with class-based inheritance. 
+//To get a grade A or B you must detect such circular inheritance to avoid infinite loops in your search for a matching function. "
+//( ^ enl. Peter)
 
 //tror vi  har tänkt fel ang. prototyperna. Tror att vi (möjligtvis jag ...) förvirrat till det för oss själva.
 //tror att vårat sätt (det sätt beskrivet av uppgiften) ska ersätta det existerande sättet, dvs. den existerande implemenatationen av prototyper
@@ -32,7 +44,7 @@ search = function(protos, funcName, parameters) {
 
 	if(protos === undefined || protos === null)
 		return undefined;
-	
+
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
 
