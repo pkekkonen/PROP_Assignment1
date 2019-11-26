@@ -6,6 +6,7 @@ var myObject = {};
 //måste se till att myObject blir proto till objektet som anropar den
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
+
 	prototypes = [];
 	obj.prototypes = prototypeList;
 	return obj;
@@ -32,7 +33,7 @@ search = function(protos, funcName, parameters) {
 		return undefined;
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
-		console.log("CURRENT   " + currentProto.name);
+		console.log("CURRENT   " + currentProto.na);
 
 		var parentProtos = getParentPrototypes(currentProto);
 		console.log(parentProtos);
@@ -40,7 +41,7 @@ search = function(protos, funcName, parameters) {
 
 		if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-			console.log("FIRST ONE     " + currentProto.name);
+			console.log("FIRST ONE     " + currentProto.na);
 			return currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
 		} else {
 			for(var j = 0; j < parentProtos.length; j++){
@@ -56,6 +57,7 @@ search = function(protos, funcName, parameters) {
 			var lastParentProto = {};
 			while (lastParentProto.__proto__ !== myObject  && k >= 0) {
 				lastParentProto = parentProtos[k];
+				console.log("HÄÄÄÄääÄÄär   " + lastParentProto.na);
 				k--;
 			}
 			if(lastParentProto !== undefined) {
@@ -76,27 +78,36 @@ search = function(protos, funcName, parameters) {
 }
 
 //måste vi kolla typen? Checka att proto verkligen är en object??
+//prototypes
 getParentPrototypes = function(proto) { 
 	var parentProtos = [];
 
+console.log("PROTO   :::" + proto.na);
+
 	while(proto.__proto__ != null) {
-			parentProtos.push(proto.__proto__);
-			proto = proto.__proto__;
+		proto = proto.__proto__;
+		parentProtos.push(proto);
+		if(proto === myObject) {
+			console.log("JAG ÄR EN MYOBJECT");
+		}
+		console.log("PARENTS      " + proto.na);
+
 	}
 
 	return parentProtos;
 }
 
 var obj0 = myObject.create(null);
+
 obj0.func = function(arg) { return "func0: " + arg; };
-obj0.name = "obj0";
+obj0.na = "obj0";
 var obj1 = myObject.create([obj0]);
-obj1.name = "obj1";
+obj1.na = "obj1";
 var obj2 = myObject.create([]);
-obj2.name = "obj2";
+obj2.na = "obj2";
 obj2.func = function(arg) { return "func2: " + arg; };
 var obj3 = myObject.create([obj1, obj2]);
-obj3.name = "obj3";
+obj3.na = "obj3";
 var result = obj3.call("func", ["hello"]);
 
 
