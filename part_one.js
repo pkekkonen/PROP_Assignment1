@@ -17,14 +17,15 @@ myObject.create = function(prototypeList) {
 
 };
 
-
+//vad ska denna returna om inte function finns?
+//måste vi kolla att parametrarna stämmer (antalsmässigt etc)
 myObject.call = function(funcName, parameters) {
 	//börjar söka igenom element 0 i protoypes, sedan dess grand-prototypes
 	//finns den inte i det ledet så rör vi oss till element 1 etc.
 
 	//ska först kolla i själva objektet man anropar med
-	if(myObject.hasOwnProperty(funcName))
-		return myObject[funcName](parameters);
+	if(this.hasOwnProperty(funcName)) 
+		return this[funcName](parameters);
 
 	return search(this.prototypes,funcName, parameters);
 	//TODO: gör koll om prototypes lista finns. Fast vad menar jag med det för den måste väl finnas eftersom myObject är en prototyp till objektet 
@@ -32,7 +33,8 @@ myObject.call = function(funcName, parameters) {
 
 search = function(protos, funcName, parameters) {
 
-	if(protos === undefined)
+	//om den inte har några prototyper i x-led så måste vi fortfarande kolla dess prototyper i y-led
+	if(protos === undefined || protos === null)
 		return undefined;
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
@@ -54,6 +56,7 @@ search = function(protos, funcName, parameters) {
 				}
 			}
 			//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
+			//här rör vi oss ett steg nedåt
 			var k = parentProtos.length-1;
 			var lastParentProto = {};
 			while (lastParentProto.__proto__ !== myObject  && k >= 0) {
@@ -96,23 +99,29 @@ getParentPrototypes = function(proto) {
 	return parentProtos;
 }
 
-var obj0 = myObject.create(null);
 
+//TESTKOD
+var obj0 = myObject.create(null);
 obj0.func = function(arg) { return "func0: " + arg; };
-obj0.na = "obj0";
 var obj1 = myObject.create([obj0]);
-obj1.na = "obj1";
 var obj2 = myObject.create([]);
-obj2.na = "obj2";
 obj2.func = function(arg) { return "func2: " + arg; };
 var obj3 = myObject.create([obj1, obj2]);
-obj3.na = "obj3";
-var result = obj3.call("func", ["hello"]);
+var result = obj3.call("func", ["hello"]) ;
+console.log("should print ’func0: hello’ ->", result);
 
-console.log("RESULT  " + result);
+obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+obj1 = myObject.create([obj0]);
+obj2 = myObject.create([]);
+obj3 = myObject.create([obj2, obj1]);
+result = obj3.call("func", ["hello"]);
+console.log("should print ’func0: hello’ ->", result);
 
-
-
+obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+result = obj0.call("func", ["hello"]);
+console.log("should print ’func0: hello’ ->", result);
 
 
 
