@@ -2,6 +2,7 @@
 //call(funkName, parametee
 
 var myObject = {};
+myObject.beenHere = false;
 
 //måste se till att myObject blir proto till objektet som anropar den
 myObject.create = function(prototypeList) {
@@ -44,6 +45,9 @@ search = function(protos, funcName, parameters) {
 		return undefined;
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
+		if (currentProto.beenHere == false){
+		currentProto.beenHere = true;
+		console.log("Nollte    "+currentProto.beenHere);
 
 		var parentProtos = getParentPrototypes(currentProto);
 
@@ -51,16 +55,18 @@ search = function(protos, funcName, parameters) {
 		//vi måste se till att gå igenom dess listas lista
 		if(currentProto.hasOwnProperty(funcName)) { //förutsätter att funcname är inskickad som String
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-			var result = currentProto[funcName](parameters); //varför returnar denna inte hela vägen??
+			var result = currentProto[funcName](parameters); 
 			return result;
 		} else {
 			for(var j = 0; j < parentProtos.length; j++){
-				var currentParentProto = parentProtos[j];
-				if(currentParentProto.hasOwnProperty(funcName)) {
-					//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
-					return currentParentProto[funcName](parameters);
+				var currentParentProto = parentProtos[j];	
+					if (parentProtos[0] || currentParentProto.beenHere == false){
+						console.log("parent     "+currentParentProto.beenHere);
+						currentParentProto.beenHere = true;
+					if(currentParentProto.hasOwnProperty(funcName)) {
+						//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
+						return currentParentProto[funcName](parameters);
 				}
-			}
 			//när vi har nått null så vill vi röra oss ett steg nedåt och ett steg åt höger i dess prototypes lista förutsatt att den har en 
 			//här rör vi oss ett steg nedåt
 			var k = parentProtos.length-1;
@@ -85,11 +91,15 @@ search = function(protos, funcName, parameters) {
  					return result;
 			}
 		}
+		var currentParentProto = parentProtos[j+1]; // hoppar till null/undefined
+	}
 		//kolla om proto har funktionen
 		//om inte så leta uppåt i dess prototyper
 	}
-
+	var currentProto = protos[i+1]; // hoppar till null/undefined
+	}
 	return undefined;
+	}
 }
 
 //måste vi kolla typen? Checka att proto verkligen är en object??
@@ -108,22 +118,24 @@ getParentPrototypes = function(proto) {
 
 //TESTKOD
 var obj0 = myObject.create(null);
-obj0.func = function(arg) { return "func0: " + arg; };
+//obj0.func = function(arg) { return "func0: " + arg; };
 var obj1 = myObject.create([obj0]);
 var obj2 = myObject.create([]);
 obj2.func = function(arg) { return "func2: " + arg; };
 var obj3 = myObject.create([obj1, obj2]);
 var result = obj3.call("func", ["hello"]) ;
-console.log("should print ’func0: hello’ ->", result);
+console.log("should print ’func2: hello’ ->", result);
 
 obj0 = myObject.create(null);
 obj1 = myObject.create([]);
 obj1.addPrototype(obj0);
-obj1.func = function(arg) { return "func1: " + arg; };
 obj2 = myObject.create([]);
 obj3 = myObject.create([obj2, obj1]);
+obj2.addPrototype(obj3);
+obj4 = myObject.create([obj3]);
+obj4.func = function(arg) { return "func1: " + arg; };
 result = obj3.call("func", ["hello"]);
-console.log("should print ’func0: hello’ ->", result);
+console.log("should print ’func1: hello’ ->", result);
 
 obj0 = myObject.create(null);
 obj0.func = function(arg) { return "func0: " + arg; };
