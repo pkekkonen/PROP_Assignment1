@@ -18,6 +18,6 @@ templateClass.new = function() {
 	return obj;
 }
 
-templateClass.call = call(funcName, parameters) {
+templateClass.call = function(funcName, parameters) {
 
 }
