@@ -51,6 +51,7 @@ myObject.addPrototype = function(obj){
 
 search = function(protos, funcName, parameters) {
 
+	//kan inte ens vara detta va?
 	if(protos === undefined || protos === null)
 		return undefined;
 
