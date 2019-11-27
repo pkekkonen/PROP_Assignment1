@@ -9,7 +9,6 @@ createClass = function(className, superClassList) {
 	obj.className = className;
 	obj.superClassList = (superClassList != null? superClassList: []);
 
-	console.log(className + "     " + superClassList);
 	return obj;
 }
 
@@ -19,20 +18,15 @@ templateClass.new = function() {
 }
 
 templateClass.call = function(funcName, parameters) {
-	if(this.hasOwnProperty(funcName)) {
-		console.log(funcName);
+	if(this.hasOwnProperty(funcName) || this.__proto__.hasOwnProperty(funcName)) 
 		return this[funcName](parameters);
-	} 
-	if(this.__proto__.hasOwnProperty(funcName)) {
-		return this.__proto__[funcName](parameters);
-	}
+	
 	return search(this.superClassList, funcName, parameters);
 }
 
 search = function(superClassList, funcName, parameters) {
 	for(var i = 0; i < superClassList.length; i++){
 		var currentSuperClass = superClassList[i];
-		console.log(currentSuperClass + "Här är jag")
 		if(currentSuperClass.hasOwnProperty(funcName)) {
 			var result = currentSuperClass[funcName](parameters);
 			if (result != undefined){
