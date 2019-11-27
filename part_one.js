@@ -47,7 +47,7 @@ search = function(protos, funcName, parameters) {
 		var currentProto = protos[i];
 		if (currentProto.beenHere == false){
 		currentProto.beenHere = true;
-		console.log("Nollte    "+currentProto.beenHere);
+		console.log("Nollte  " + currentProto.name + "  "+currentProto.beenHere);
 
 		var parentProtos = getParentPrototypes(currentProto);
 
@@ -60,8 +60,8 @@ search = function(protos, funcName, parameters) {
 		} else {
 			for(var j = 0; j < parentProtos.length; j++){
 				var currentParentProto = parentProtos[j];	
-					if (parentProtos[0] || currentParentProto.beenHere == false){
-						console.log("parent     "+currentParentProto.beenHere);
+					if (parentProtos[0] || currentParentProto.beenHere == false){ //obs noll vad menar jag ens
+						console.log("parent  " +currentParentProto.name + "   "+currentParentProto.beenHere);
 						currentParentProto.beenHere = true;
 					if(currentParentProto.hasOwnProperty(funcName)) {
 						//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
@@ -73,30 +73,33 @@ search = function(protos, funcName, parameters) {
 			var lastParentProto = {};
 			while (lastParentProto.__proto__ !== myObject  && k >= 0) {
 				lastParentProto = parentProtos[k];
+				console.log("lastParentProto     " + lastParentProto.name + lastParentProto);
 				k--;
-			}
 			if(lastParentProto !== myObject && lastParentProto !== undefined) {
-
-				var result = search(lastParentProto.prototypes, funcName, parameters);
-
-				if(result !== undefined) {
-					return result;
+				if(lastParentProto.prototypes !== undefined){
+					for(var m = 1; m < lastParentProto.prototypes.length; m++){
+					lastParentProto = lastParentProto.prototypes[m];
+					console.log("lastParentProto 2     " + lastParentProto.name);
+					var result = search(lastParentProto.prototypes, funcName, parameters);
+					console.log("result     "+result);
+						if(result !== undefined) {
+							return result;
+						}
+					}
 				}
+			}
 			//om den är undefined så betyder det att den aldrig hittade någon funktion i det rekursiva anropet och det betyder att vi ska röra oss till nästa element i prototypesList
 			}
-
 			if(currentProto.__proto__ === myObject) {
 				var result = search(currentProto.prototypes, funcName, parameters);
  				if(result != undefined)
  					return result;
 			}
 		}
-		var currentParentProto = parentProtos[j+1]; // hoppar till null/undefined
 	}
 		//kolla om proto har funktionen
 		//om inte så leta uppåt i dess prototyper
 	}
-	var currentProto = protos[i+1]; // hoppar till null/undefined
 	}
 	return undefined;
 	}
@@ -110,19 +113,30 @@ getParentPrototypes = function(proto) {
 	while(proto.__proto__ != null) {
 		proto = proto.__proto__;
 		parentProtos.push(proto);
+		console.log("get parents 2   "+proto.name);
 	}
-
+	
+//		if(proto.prototypes != null){
+//			for(var l = 0; l < proto.prototypes.length; l++){
+//				console.log("get parents  "+proto.prototypes[l].name);
+//				parentProtos.push(proto.prototypes[l]);
+//			}
+//		}
 	return parentProtos;
 }
 
 
 //TESTKOD
 var obj0 = myObject.create(null);
+obj0.name = "obj0";
 //obj0.func = function(arg) { return "func0: " + arg; };
 var obj1 = myObject.create([obj0]);
+obj1.name = "obj1";
 var obj2 = myObject.create([]);
+obj2.name = "obj2";
 obj2.func = function(arg) { return "func2: " + arg; };
 var obj3 = myObject.create([obj1, obj2]);
+obj3.name = "obj3";
 var result = obj3.call("func", ["hello"]) ;
 console.log("should print ’func2: hello’ ->", result);
 
