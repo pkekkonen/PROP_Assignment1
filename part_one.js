@@ -24,30 +24,43 @@
 
 //create own kind of collection 
 var myObject = {};
+var count = 0;
+
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
-	obj.hasPrototypes = "hej";
+	obj.hasPrototypes;
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
 
-	obj.getPrototypes = function() {
-		return 	(prototypeList != null ? prototypeList: []);
+	obj.getPrototypes = function() {};
+
+	obj.setPrototypes = function(prototypes) {
+		prototypes = (prototypes != null? prototypes : []);
+
+		obj.getPrototypes = function() {
+			var prototypeList = prototypes;
+			console.log("hejsan   " + count +    "  längddd  " + prototypeList.length);
+			count++;
+			return 	(prototypeList != null ? prototypeList: []);
+		}
 	}
+
 
 	obj.addPrototype = function(objToAdd) {
 		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
 			if(!objToAdd.hasOwnProperty("hasPrototypes")) {
 				if(searchAfterObject(this.getPrototypes(), this) === false) {
+					console.log("HEJ  " + objToAdd.na)
 					currentPrototypeList = this.getPrototypes();
-					obj.getPrototypes = function() {
-						return currentPrototypeList.push(objToAdd);
-					}
+					obj.setPrototypes(currentPrototypeList.push(objToAdd));
+
 				}
 			}
 		}
 	}
 
+	obj.setPrototypes(prototypeList);
 	return obj;
 
 
@@ -149,20 +162,23 @@ searchAfterObject = function(protos, searchedObject) {
 
 
 //Circular
-var obj0 = myObject.create(null);
-var obj1 = myObject.create([obj0]);
-obj1.name = "obj1";
-obj0.name = "obj0";
+var obj1 = myObject.create(null);
+var obj0 = myObject.create([obj1]);
+obj1.na = "obj1";
+obj0.na = "obj0";
 
-var obj3 = {name: "hej"};
-obj3.name = "obj3"
-obj0.addPrototype(obj3);
-console.log(obj0.getPrototypes());
+var obj3 = {na: "hej"};
+obj3.na = "obj3"
+obj1.addPrototype(obj3);
 
-var obj2 = myObject.create([obj0]);
 
-result = obj2.call("func", ["hello"]);
-console.log("should print ’undefined ->", result);
+var obj1list =obj1.getPrototypes();
+console.log(obj1list.length);
+
+for(var i = 0; i < obj1list.length; i ++) {
+	console.log(i + " : " +obj1list.na);
+}
+
 
 
 
