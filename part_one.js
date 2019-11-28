@@ -27,26 +27,25 @@ var myObject = {};
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
-	obj.hasPrototypes;
+	obj.hasPrototypes = "hej";
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
-	prototypes = (prototypeList != null? prototypeList: []);
-
-	obj.addPrototype = function(obj) {
-	if(searchAfterObject(this.getPrototypes(), obj) === false) {
-		if(!obj.hasOwnProperty("hasPrototypes")) {
-			if(searchAfterObject(this.getPrototypes(), this) === false) {
-				console.log("HHFHH")
-				prototypes.push(obj);
-			}
-		}
-	}
-
-
-	}
 
 	obj.getPrototypes = function() {
-		return 	(prototypes != null ? prototypes: []);
+		return 	(prototypeList != null ? prototypeList: []);
+	}
+
+	obj.addPrototype = function(objToAdd) {
+		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
+			if(!objToAdd.hasOwnProperty("hasPrototypes")) {
+				if(searchAfterObject(this.getPrototypes(), this) === false) {
+					currentPrototypeList = this.getPrototypes();
+					obj.getPrototypes = function() {
+						return currentPrototypeList.push(objToAdd);
+					}
+				}
+			}
+		}
 	}
 
 	return obj;
@@ -97,8 +96,7 @@ searchAfterFunction = function(protos, funcName, parameters) {
 }
 
 searchAfterObject = function(protos, searchedObject) {
-	console.log("här" + searchedObject.name);
-	console.log("här2 " + protos[0].name);
+
 		console.log();
 
 
