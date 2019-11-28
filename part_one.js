@@ -33,15 +33,13 @@ myObject.create = function(prototypeList) {
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
 
-	obj.getPrototypes = function() {};
+	//obj.getPrototypes = function() {};
 
 	obj.setPrototypes = function(prototypes) {
 		prototypes = (prototypes != null? prototypes : []);
 
 		obj.getPrototypes = function() {
 			var prototypeList = prototypes;
-			console.log("hejsan   " + count +    "  längddd  " + prototypeList.length);
-			count++;
 			return 	(prototypeList != null ? prototypeList: []);
 		}
 	}
@@ -51,9 +49,9 @@ myObject.create = function(prototypeList) {
 		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
 			if(!objToAdd.hasOwnProperty("hasPrototypes")) {
 				if(searchAfterObject(this.getPrototypes(), this) === false) {
-					console.log("HEJ  " + objToAdd.na)
 					currentPrototypeList = this.getPrototypes();
-					obj.setPrototypes(currentPrototypeList.push(objToAdd));
+					newPrototypeList = currentPrototypeList.push(objToAdd);
+					obj.setPrototypes(newPrototypeList);
 
 				}
 			}
@@ -167,18 +165,32 @@ var obj0 = myObject.create([obj1]);
 obj1.na = "obj1";
 obj0.na = "obj0";
 
+
+console.log("LISTA")
+var obj0list =obj0.getPrototypes();
+console.log("längd  " + obj0list.length);
+
+for(var i = 0; i < obj0list.length; i ++) {
+	console.log("l   " + i + " : " +obj0list[i].na);
+}
+console.log("SLUT PÅ LISTA")
+
+console.log();
+
 var obj3 = {na: "hej"};
 obj3.na = "obj3"
-obj1.addPrototype(obj3);
+obj0.addPrototype(obj3);
 
+console.log("LISTA IGEN")
 
-var obj1list =obj1.getPrototypes();
-console.log(obj1list.length);
+var obj0ist =obj0.getPrototypes();
+console.log("lista längd  " + obj0list.length);
 
-for(var i = 0; i < obj1list.length; i ++) {
-	console.log(i + " : " +obj1list.na);
+for(var i = 0; i < obj0list.length; i ++) {
+	console.log("l  " + i + " : " +obj0list[i].na);
 }
 
+console.log("SLUT PÅ LISTA IGEN")
 
 
 
