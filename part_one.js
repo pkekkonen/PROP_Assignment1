@@ -25,40 +25,37 @@
 //create own kind of collection 
 var myObject = {};
 var count = 0;
+var ja = false;
 
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
-	obj.hasPrototypes;
+	obj.hasPrototypes = true;
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
 
-	//obj.getPrototypes = function() {};
+	obj.getPrototypes = function() {};
 
-	obj.setPrototypes = function(prototypes) {
-		prototypes = (prototypes != null? prototypes : []);
-
-		obj.getPrototypes = function() {
-			var prototypeList = prototypes;
-			return 	(prototypeList != null ? prototypeList: []);
+	var setPrototypes = function(objToSet, prototypes) {
+		objToSet.getPrototypes = function() {
+			var newProtos = (prototypes != null? prototypes : []);
+			return 	newProtos;
 		}
 	}
 
-
 	obj.addPrototype = function(objToAdd) {
-		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
-			if(!objToAdd.hasOwnProperty("hasPrototypes")) {
-				if(searchAfterObject(this.getPrototypes(), this) === false) {
-					currentPrototypeList = this.getPrototypes();
-					newPrototypeList = currentPrototypeList.push(objToAdd);
-					obj.setPrototypes(newPrototypeList);
 
-				}
+		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
+			if((!objToAdd.hasOwnProperty("hasPrototypes")) ||(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterObject(objToAdd.getPrototypes(), this) === false))) {
+					currentPrototypeList = this.getPrototypes();
+					currentPrototypeList.push(objToAdd);
+					setPrototypes(this, currentPrototypeList);
+
 			}
 		}
 	}
-
-	obj.setPrototypes(prototypeList);
+	 
+	setPrototypes(obj, prototypeList);
 	return obj;
 
 
@@ -108,9 +105,7 @@ searchAfterFunction = function(protos, funcName, parameters) {
 
 searchAfterObject = function(protos, searchedObject) {
 
-		console.log();
-
-
+	console.log("SEARCHING   " +searchedObject.na)
 	//kan inte ens vara detta va?
 	if(protos === undefined || protos === null)
 		return undefined;
@@ -122,9 +117,9 @@ searchAfterObject = function(protos, searchedObject) {
 			return true;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = search(currentProto.getPrototypes(), searchedObject);
-				if(result !== undefined) {
-					return result;
+				var result = searchAfterObject(currentProto.getPrototypes(), searchedObject);
+				if(result !== undefined) { //KAN EJ BLI
+					return result; 
 				}
 			}
 
@@ -166,7 +161,7 @@ obj1.na = "obj1";
 obj0.na = "obj0";
 
 
-console.log("LISTA")
+console.log("LISTA  " + obj0.na)
 var obj0list =obj0.getPrototypes();
 console.log("längd  " + obj0list.length);
 
@@ -177,23 +172,55 @@ console.log("SLUT PÅ LISTA")
 
 console.log();
 
-var obj3 = {na: "hej"};
+
+
+var obj3 = myObject.create([obj0, obj1]);
 obj3.na = "obj3"
 obj0.addPrototype(obj3);
 
-console.log("LISTA IGEN")
+console.log("LISTA IGEN2  "+ obj0.na)
 
-var obj0ist =obj0.getPrototypes();
-console.log("lista längd  " + obj0list.length);
+var obj0list2 =obj0.getPrototypes();
+console.log("lista längd  ::" + obj0list2.length);
 
-for(var i = 0; i < obj0list.length; i ++) {
-	console.log("l  " + i + " : " +obj0list[i].na);
+for(var i = 0; i < obj0list2.length; i ++) {
+	console.log("l  " + i + " : " +obj0list2[i].na);
+}
+
+console.log("SLUT PÅ LISTA IGEN!")
+
+
+console.log();
+console.log("LISTA OBJ3  " +obj3.na)
+
+var obj3list =obj3.getPrototypes();
+console.log("lista längd  " + obj3list.length);
+
+for(var i = 0; i < obj3list.length; i ++) {
+	console.log("l  " + i + " : " +obj3list[i].na);
 }
 
 console.log("SLUT PÅ LISTA IGEN")
 
+console.log()
+console.log()
+
+var obj9 = myObject.create(null);
+obj9.na = "obj9"
+//setPrototypes(obj9, [obj1, obj0]);
 
 
+console.log();
+console.log("LISTA OBJ9  " +obj9.na)
+
+var obj9list =obj9.getPrototypes();
+console.log("lista längd  " + obj9list.length);
+
+for(var i = 0; i < obj9list.length; i ++) {
+	console.log("l  " + i + " : " +obj9list[i].na);
+}
+
+console.log("SLUT PÅ LISTA IGEN")
 
 //Test 
 //obj9 = {};
