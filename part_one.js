@@ -21,25 +21,42 @@
 //tror att vårat sätt (det sätt beskrivet av uppgiften) ska ersätta det existerande sättet, dvs. den existerande implemenatationen av prototyper
 // Object ska också ligga som proto i vår lista?
 
+
+//create own kind of collection 
 var myObject = {};
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
-
+	obj.hasPrototypes;
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
-	obj.prototypes = (prototypeList !== null? prototypeList : []);
+	prototypes = (prototypeList != null? prototypeList: []);
+
+	obj.addPrototype = function(obj) {
+	if(searchAfterObject(this.getPrototypes(), obj) === false) {
+		if(!obj.hasOwnProperty("hasPrototypes")) {
+			if(searchAfterObject(this.getPrototypes(), this) === false) {
+				console.log("HHFHH")
+				prototypes.push(obj);
+			}
+		}
+	}
+
+
+	}
+
+	obj.getPrototypes = function() {
+		return 	(prototypes != null ? prototypes: []);
+	}
+
 	return obj;
 
-	// variabler? hittas inte i prototyp
-
-};
-
-myObject.addPrototype = function(obj){
-	this.prototypes.push(obj);
 
 }
-	
+
+//utför kontroll av att det inte kommer leda till ett cirkulärt förhållande
+//kolla om obj redan finns i kedjan av prototyper?
+
 
 //vad ska denna returna om inte function finns?
 //måste vi kolla att parametrarna stämmer (antalsmässigt etc)
@@ -48,15 +65,11 @@ myObject.call = function(funcName, parameters) {
 	if(this.hasOwnProperty(funcName)) 
 		return this[funcName](parameters);
 
-	return search(this.prototypes,funcName, parameters);
+	return searchAfterFunction(this.getPrototypes() ,funcName, parameters);
 };
 
-myObject.addPrototype = function(obj){
-	this.prototypes.push(obj);
 
-}
-
-search = function(protos, funcName, parameters) {
+searchAfterFunction = function(protos, funcName, parameters) {
 
 	//kan inte ens vara detta va?
 	if(protos === undefined || protos === null)
@@ -71,8 +84,8 @@ search = function(protos, funcName, parameters) {
 			if(result !== undefined)
 				return result;
 		} else {
-			if(currentProto.hasOwnProperty("prototypes")) {
-				var result = search(currentProto.prototypes, funcName, parameters);
+			if(currentProto.hasOwnProperty("hasPrototypes")) {
+				var result = searchAfterFunction(currentProto.getPrototypes(), funcName, parameters);
 				if(result !== undefined) {
 					return result;
 				}
@@ -83,29 +96,56 @@ search = function(protos, funcName, parameters) {
 	return undefined;
 }
 
+searchAfterObject = function(protos, searchedObject) {
+	console.log("här" + searchedObject.name);
+	console.log("här2 " + protos[0].name);
+		console.log();
+
+
+	//kan inte ens vara detta va?
+	if(protos === undefined || protos === null)
+		return undefined;
+
+	for(var i = 0; i < protos.length; i++) {
+		var currentProto = protos[i];
+
+		if(currentProto === searchedObject) { 
+			return true;
+		} else {
+			if(currentProto.hasOwnProperty("hasPrototypes")) {
+				var result = search(currentProto.getPrototypes(), searchedObject);
+				if(result !== undefined) {
+					return result;
+				}
+			}
+
+		}
+	}
+	return false;
+}
 
 
 //TESTKOD
-var obj0 = myObject.create(null);
-obj0.func = function(arg) { return "func0: " + arg; };
-var obj1 = myObject.create([obj0]);
-var obj2 = myObject.create([]);
-obj2.func = function(arg) { return "func2: " + arg; };
-var obj3 = myObject.create([obj1, obj2]);
+//var obj0 = myObject.create(null);
+//obj0.func = function(arg) { return "func0: " + arg; };
+//var obj1 = myObject.create([obj0]);
+//var obj2 = myObject.create([]);
+//obj2.func = function(arg) { return "func2: " + arg; };
+//var obj3 = myObject.create([obj1, obj2]);
 //var result = obj3.call("func", ["hello"]) ;
 //console.log("should print ’func0: hello’ ->", result);
 
-obj0 = myObject.create(null);
-obj1 = myObject.create([]);
-obj1.addPrototype(obj0);
-obj1.func = function(arg) { return "func1: " + arg; };
-obj2 = myObject.create([]);
-obj3 = myObject.create([obj2, obj1]);
+//obj0 = myObject.create(null);
+//obj1 = myObject.create([]);
+//obj1.addPrototype(obj0);
+//obj1.func = function(arg) { return "func1: " + arg; };
+//obj2 = myObject.create([]);
+//obj3 = myObject.create([obj2, obj1]);
 //result = obj3.call("func", ["hello"]);
 //console.log("should print ’func0: hello’ ->", result);
 
-obj0 = myObject.create(null);
-obj0.func = function(arg) { return "func0: " + arg; };
+//obj0 = myObject.create(null);
+//obj0.func = function(arg) { return "func0: " + arg; };
 //result = obj0.call("func", ["hello"]);
 //console.log("should print ’func0: hello’ ->", result);
 
@@ -113,8 +153,14 @@ obj0.func = function(arg) { return "func0: " + arg; };
 //Circular
 var obj0 = myObject.create(null);
 var obj1 = myObject.create([obj0]);
+obj1.name = "obj1";
+obj0.name = "obj0";
 
-obj0.addPrototype(obj1);
+var obj3 = {name: "hej"};
+obj3.name = "obj3"
+obj0.addPrototype(obj3);
+console.log(obj0.getPrototypes());
+
 var obj2 = myObject.create([obj0]);
 
 result = obj2.call("func", ["hello"]);
@@ -124,14 +170,15 @@ console.log("should print ’undefined ->", result);
 
 
 //Test 
-obj9 = {};
-obj9.funcy = function() {console.log("hallå");};
+//obj9 = {};
+//obj9.funcy = function() {console.log("hallå");};
 
-obj0 = myObject.create([obj9]);
-obj1 = {};
-obj1.func = function() {console.log("heeeej");};
-obj2 = obj0.create([obj0]);
+//obj0 = myObject.create([obj9]);
+//obj1 = {};
+//obj1.func = function() {console.log("heeeej");};
+//obj2 = obj0.create([obj0]);
 //obj2.call("funcy", []);
+
 
 
 
