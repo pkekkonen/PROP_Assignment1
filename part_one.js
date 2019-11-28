@@ -25,8 +25,6 @@
 //create own kind of collection 
 var myObject = {};
 var count = 0;
-var ja = false;
-
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
@@ -36,6 +34,7 @@ myObject.create = function(prototypeList) {
 
 	obj.getPrototypes = function() {};
 
+	//var gör att denna bara är definierad här (lokalt)
 	var setPrototypes = function(objToSet, prototypes) {
 		objToSet.getPrototypes = function() {
 			var newProtos = (prototypes != null? prototypes : []);
@@ -105,7 +104,6 @@ searchAfterFunction = function(protos, funcName, parameters) {
 
 searchAfterObject = function(protos, searchedObject) {
 
-	console.log("SEARCHING   " +searchedObject.na)
 	//kan inte ens vara detta va?
 	if(protos === undefined || protos === null)
 		return undefined;
@@ -130,30 +128,30 @@ searchAfterObject = function(protos, searchedObject) {
 
 
 //TESTKOD
-//var obj0 = myObject.create(null);
-//obj0.func = function(arg) { return "func0: " + arg; };
-//var obj1 = myObject.create([obj0]);
-//var obj2 = myObject.create([]);
-//obj2.func = function(arg) { return "func2: " + arg; };
-//var obj3 = myObject.create([obj1, obj2]);
-//var result = obj3.call("func", ["hello"]) ;
-//console.log("should print ’func0: hello’ ->", result);
+var obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+var obj1 = myObject.create([obj0]);
+var obj2 = myObject.create([]);
+obj2.func = function(arg) { return "func2: " + arg; };
+var obj3 = myObject.create([obj1, obj2]);
+var result = obj3.call("func", ["hello"]) ;
+console.log("should print ’func0: hello’ ->", result);
 
-//obj0 = myObject.create(null);
-//obj1 = myObject.create([]);
-//obj1.addPrototype(obj0);
-//obj1.func = function(arg) { return "func1: " + arg; };
-//obj2 = myObject.create([]);
-//obj3 = myObject.create([obj2, obj1]);
-//result = obj3.call("func", ["hello"]);
-//console.log("should print ’func0: hello’ ->", result);
+obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+obj1 = myObject.create([obj0]);
+obj2 = myObject.create([]);
+obj3 = myObject.create([obj2, obj1]);
+result = obj3.call("func", ["hello"]);
+console.log("should print ’func0: hello’ ->", result);
 
-//obj0 = myObject.create(null);
-//obj0.func = function(arg) { return "func0: " + arg; };
-//result = obj0.call("func", ["hello"]);
-//console.log("should print ’func0: hello’ ->", result);
+obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+result = obj0.call("func", ["hello"]);
+console.log("should print ’func0: hello’ ->", result);
 
 
+console.log("-------------------------------------------------------------------------------------")
 //Circular
 var obj1 = myObject.create(null);
 var obj0 = myObject.create([obj1]);
