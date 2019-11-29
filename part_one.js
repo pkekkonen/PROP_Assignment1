@@ -32,23 +32,21 @@ myObject.create = function(prototypeList) {
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
 
-	obj.getPrototypes = function() {};
+	obj.prototypes = function() {};
 
 	//var gör att denna bara är definierad här (lokalt)
 	var setPrototypes = function(objToSet, prototypes) {
 		objToSet.getPrototypes = function() {
-			var newProtos = (prototypes != null? prototypes : []);
-			return 	newProtos;
+			return 	(prototypes != null? prototypes : []);
 		}
 	}
 
+	//kolla att man inte försöker lägga till en prototyp till sig själv
 	obj.addPrototype = function(objToAdd) {
 
 		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
 			if((!objToAdd.hasOwnProperty("hasPrototypes")) ||(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterObject(objToAdd.getPrototypes(), this) === false))) {
-					currentPrototypeList = this.getPrototypes();
-					currentPrototypeList.push(objToAdd);
-					setPrototypes(this, currentPrototypeList);
+					setPrototypes(this, this.getPrototypes().push(objToAdd));
 
 			}
 		}
@@ -74,12 +72,8 @@ myObject.call = function(funcName, parameters) {
 	return searchAfterFunction(this.getPrototypes() ,funcName, parameters);
 };
 
-
+//TODO: måste vi kolla om parametrarna stämmer? Antar nej?
 searchAfterFunction = function(protos, funcName, parameters) {
-
-	//kan inte ens vara detta va?
-	if(protos === undefined || protos === null)
-		return undefined;
 
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
@@ -102,11 +96,8 @@ searchAfterFunction = function(protos, funcName, parameters) {
 	return undefined;
 }
 
+//gör om så skickar in de två objekten och se om addition av obj2 till obj1 leder till circular (slippa flera if satser)
 searchAfterObject = function(protos, searchedObject) {
-
-	//kan inte ens vara detta va?
-	if(protos === undefined || protos === null)
-		return undefined;
 
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
@@ -116,9 +107,8 @@ searchAfterObject = function(protos, searchedObject) {
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
 				var result = searchAfterObject(currentProto.getPrototypes(), searchedObject);
-				if(result !== undefined) { //KAN EJ BLI
-					return result; 
-				}
+				if(result === true)
+					return result; //om det är falskt så vill vi fortsätta leta efter
 			}
 
 		}
