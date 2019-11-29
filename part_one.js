@@ -26,16 +26,14 @@ var myObject = {};
 myObject.create = function(prototypeList) {
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
-	var prototypes = (prototypeList !== null? prototypeList : []);
-	
-	//for (var i = 0; prototypeList !== null && i < prototypeList.length ; i++){
-	//	this.addPrototype(prototypeList[i]);
-	//	console.log(prototypeList[i].name);
-	//}
+//	var prototypes = (prototypeList !== null? prototypeList : []);
+
+	var prototypes = []; // bör inte nås utifrån
+
 	
 	this.addPrototype = function(obj) {
 		prototypes.push(obj);
-		prototypeList.push(obj);
+		prototypeList.push(obj); //obs inte båda 
 		console.log(obj.name + " hej");
 	}
 	
@@ -51,6 +49,7 @@ myObject.create = function(prototypeList) {
 myObject.call = function(funcName, parameters) {
 
 	if(myObject.hasOwnProperty(funcName)) {
+		console.log("Här borde jag inte vara");
 		return this[funcName](parameters);
 	} else {console.log("searching")};
 	return search(this.prototypeList,funcName, parameters);
