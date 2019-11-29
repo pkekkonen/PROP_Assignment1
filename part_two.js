@@ -22,7 +22,7 @@ createClass = function(className, superClassList) {
 			return;
 		if(!searchAfterSuperClass(this.getSuperClassList(), classToAdd.className))
 			if(!searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) 
-				setSuperClassList(this, this.getSuperClassList.push(classToAdd));
+				setSuperClassList(this, this.getSuperClassList().push(classToAdd));
 	}
 
 	setSuperClassList(newClass, superClassList);
