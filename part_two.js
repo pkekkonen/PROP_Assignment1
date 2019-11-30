@@ -2,6 +2,10 @@
 // ^ ang. den förvirrande meningen i uppgiftsbeskr.
 
 
+//QUESTIONS: 
+//  -  Regarding circular prevention: "The last line above should generate an error, since it would cause circular inheritance."
+//     så ska addPrototype anrop som leder till cirkulärt beteende generera ett fel (och på vilket sätt). För som det är just nu så tillåts man bara inte göra det men det uppstår inget "Error"
+  
 var templateClass = {};
 
 createClass = function(className, superClassList) {
@@ -9,7 +13,7 @@ createClass = function(className, superClassList) {
 	newClass.className = className;
 	newClass.isClass = true;
 
-	newClass.getSuperClassList = function() {};
+	//newClass.getSuperClassList = function() {};
 
 	var setSuperClassList = function(classToSet, superClassList) {
 		classToSet.getSuperClassList = function() {
@@ -18,11 +22,15 @@ createClass = function(className, superClassList) {
 	}
 
 	newClass.addSuperClass = function(classToAdd) {
+		console.log("HÄR : " + classToAdd.className)
 		if(!classToAdd.hasOwnProperty("isClass"))
 			return;
 		if(!searchAfterSuperClass(this.getSuperClassList(), classToAdd.className))
-			if(!searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) 
-				setSuperClassList(this, this.getSuperClassList().push(classToAdd));
+			if(!searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) {
+				var tempList = this.getSuperClassList();
+				tempList.push(classToAdd); //viktigt att skapa tempList snarare än skicka direkt
+				setSuperClassList(this, tempList); 
+			} 
 	}
 
 	setSuperClassList(newClass, superClassList);
@@ -108,3 +116,29 @@ var obj0 = class0.new();
 result = obj0.call("func", ["hello"]);
 console.log("’result’ is assigned ’func0: hello’  "+result);
 //where ’result’ is assigned ’func0: hello’.
+
+
+//Testkod cirkulär-del
+console.log("\n\n\nCircular part \n");
+var class0 = createClass("Class 0", null);
+var class1 = createClass("Class 1", [class0]);
+var class2 = createClass("Class 2", [class3]);
+var class3 = createClass("Class 3", [class0, class1]);
+var class4 = createClass("Class 4", [class2]);
+var class5 = createClass("Class 5", [class0, class1, class2, class4]);
+var class6 = createClass("class 6", [class0, class1]);
+class3.addSuperClass(class5);
+class3.addSuperClass(class1);
+class3.addSuperClass(class6);
+
+console.log("class 3 längd (ska vara 2): " + class3.getSuperClassList().length);
+console.log("class 4 längd (ska vara 1): " + class4.getSuperClassList().length);
+console.log("class 5 längd (ska vara 4): " + class5.getSuperClassList().length);
+
+console.log("\n\nCLASS 3 SUPERKLASSER: ")
+for(var i = 0; i < class3.getSuperClassList().length; i++) 
+	console.log("CurrentElement  : " + class3.getSuperClassList()[i].className);
+
+
+
+

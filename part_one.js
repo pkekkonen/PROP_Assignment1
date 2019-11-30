@@ -32,12 +32,12 @@ myObject.create = function(prototypeList) {
 	// se till att kolla att inte null 
 	//och undefined? nej kan väl inte vara
 
-	obj.prototypes = function() {};
+	obj.getPrototypes = function() {};
 
 	//var gör att denna bara är definierad här (lokalt)
 	var setPrototypes = function(objToSet, prototypes) {
 		objToSet.getPrototypes = function() {
-			return 	(prototypes != null? prototypes : []);
+			return (prototypes != null? prototypes : []);
 		}
 	}
 
@@ -46,7 +46,10 @@ myObject.create = function(prototypeList) {
 
 		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
 			if((!objToAdd.hasOwnProperty("hasPrototypes")) ||(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterObject(objToAdd.getPrototypes(), this) === false))) {
-					setPrototypes(this, this.getPrototypes().push(objToAdd));
+				var tempList = this.getPrototypes();
+				tempList.push(objToAdd); //viktigt att skapa tempList snarare än skicka direkt
+
+				setPrototypes(this, tempList);
 
 			}
 		}
@@ -210,6 +213,30 @@ for(var i = 0; i < obj9list.length; i ++) {
 
 console.log("SLUT PÅ LISTA IGEN")
 
+console.log("-------------------------------------------------------------------------------------")
+
+var o1 = myObject.create(null);
+o1.name = "o1"
+var o2 = {name: "o2"}
+var o3 = {name: "o3"}
+var o4 = myObject.create([o2, o1]);
+o4.name = "o4"
+o1.addPrototype(o4);
+o1.addPrototype(o2);
+o4.addPrototype(o2);
+o4.addPrototype(o3);
+
+console.log("\n\nO1 längd : (ska vara 1 ) " + o1.getPrototypes().length + "\n")
+
+for(var i = 0; i < o1.getPrototypes().length; i ++) {
+	console.log("Element  " + i + " : " + o1.getPrototypes()[i].name);
+}
+
+console.log("\n\nO4 längd : (ska vara 3 ) " + o4.getPrototypes().length + "\n")
+
+for(var i = 0; i < o4.getPrototypes().length; i ++) {
+	console.log("Element  " + i + " : " + o4.getPrototypes()[i].name);
+}
 //Test 
 //obj9 = {};
 //obj9.funcy = function() {console.log("hallå");};
