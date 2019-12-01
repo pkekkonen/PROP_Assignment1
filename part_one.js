@@ -232,6 +232,7 @@ for(var i = 0; i < o1.getPrototypes().length; i ++) {
 	console.log("Element  " + i + " : " + o1.getPrototypes()[i].name);
 }
 
+o4.addPrototype(o1);
 console.log("\n\nO4 längd : (ska vara 3 ) " + o4.getPrototypes().length + "\n")
 
 for(var i = 0; i < o4.getPrototypes().length; i ++) {
