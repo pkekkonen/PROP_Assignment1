@@ -20,19 +20,19 @@ createClass = function(className, superClassList) {
 
 	//Gör vackrare
 	newClass.addSuperClass = function(classToAdd) {
-		if(!classToAdd.hasOwnProperty("isClass"))
+		if(!classToAdd.hasOwnProperty("isClass")){
 			throw "Cannot add class as superclass to itself.";
-		if(!searchAfterSuperClass(this.getSuperClassList(), classToAdd.className)) {
-			if(!searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) {
-
+			
+		} else if(searchAfterSuperClass(this.getSuperClassList(), classToAdd.className)) {
+			throw "Not adding  " + classToAdd.className+ " as a superclass since it already is.";
+			
+		} else if(searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) {
+			throw "Cannot add " + classToAdd.className +" as a superclass since it will cause circular inheritance.";
+		}
 				var tempList = this.getSuperClassList();
 				tempList.push(classToAdd); 
 				setSuperClassList(this, tempList); 
 			}
-			throw "Cannot add " + classToAdd.className +" as a superclass since it will cause circular inheritance.";
-		}
-		throw "Not adding  " + classToAdd.className+ " as a superclass since it already is.";
-	}
 
 	newClass.new = function() {
 		var obj = {};
