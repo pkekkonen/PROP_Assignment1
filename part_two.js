@@ -1,11 +1,5 @@
-// https://ilearn2.dsv.su.se/mod/forum/discuss.php?d=45930
 
-
-//QUESTIONS: 
-//  -  Regarding circular prevention: "The last line above should generate an error, since it would cause circular inheritance."
-//     så ska addPrototype anrop som leder till cirkulärt beteende generera ett fel (och på vilket sätt). För som det är just nu 
-//     så tillåts man bara inte göra det men det uppstår inget "Error"
-  
+// Paulina Lagebjer Kekkonen (pala7490) and Ida Söderberg (idso0102)
 
 createClass = function(className, superClassList) {
 	var newClass = {};
@@ -18,7 +12,6 @@ createClass = function(className, superClassList) {
 		}
 	}
 
-	//Gör vackrare
 	newClass.addSuperClass = function(classToAdd) {
 		if(!classToAdd.hasOwnProperty("isClass")){
 			throw "This parameter is not a class.";

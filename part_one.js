@@ -1,30 +1,6 @@
-//obj0.addPrototype(obj1);
-//The last line above should generate an error, since it would cause circular inheritance
-//så vi ska preventa att man kan lägga till detta. Det ska inte få ske. Snarare än att det ska få ske och vi måste städa upp konsekvenserna så ska vi förebygga det istället
 
+// Paulina Lagebjer Kekkonen (pala7490) and Ida Söderberg (idso0102)
 
-// https://ilearn2.dsv.su.se/mod/forum/discuss.php?d=61506
-// "...I conclude that you can get the grade Ok if you don't try to prevent changes after creation, but to get the grade Good if you do." 
-//( ^ regarding changing the prototypes list. vi måste förhindra att man kan göra det )
-//"...What you could have done to solve this is implement your own kind of collection tailored to have "prototype-list" behaviour."
-
-//Ang. circular behaviour
-// https://ilearn2.dsv.su.se/mod/forum/discuss.php?d=31807
-//"The text "Circular Inheritance Prevention" in the Assignment 1 text is misleading, it should be "Circular Inheritance Detection".
-// The text should be: 
-//Circular Inheritance Detection
-//There is a risk for circular inheritance both with prototype-based and with class-based inheritance. 
-//To get a grade A or B you must detect such circular inheritance to avoid infinite loops in your search for a matching function. "
-//( ^ enl. Peter)
-
-
-
-
-
-//Questions:
-// - vad ska denna returna om inte function finns?
-// - måste vi kolla att parametrarna stämmer (antalsmässigt etc)
-// - Måste kolla att det faktiskt är en funktion som vi kan anropa
 var myObject = {};
 
 myObject.create = function(prototypeList) {
@@ -94,8 +70,7 @@ searchAfterFunction = function(protos, funcName, parameters) {
 	return undefined;
 }
 
-//gör om så skickar in de två objekten och se om addition av obj2 till obj1 leder till circular (slippa flera if satser)
-//ÄNDRA NAMN?
+//Ändra namn?
 searchAfterPrototype = function(protos, searchedObject) {
 
 	for(var i = 0; i < protos.length; i++) {
