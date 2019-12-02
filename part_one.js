@@ -42,10 +42,10 @@ myObject.create = function(prototypeList) {
 		if(this === objToAdd)
 			throw "Cannot add object as prototype to itself.";
 
-		else if(searchAfterObject(this.getPrototypes(), objToAdd)) 
+		else if(searchAfterPrototype(this.getPrototypes(), objToAdd)) 
 			throw "Cannot add an already existing prototype as a prototype."
 
-		else if(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterObject(objToAdd.getPrototypes(), this)))
+		else if(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterPrototype(objToAdd.getPrototypes(), this)))
 			throw "Addition of this object as a prototype will cause circular inheritance.";
 
 		else {
@@ -77,7 +77,7 @@ searchAfterFunction = function(protos, funcName, parameters) {
 		var currentProto = protos[i];
 
 		if(currentProto.hasOwnProperty(funcName)) { 
-			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa
+			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
 			var result = currentProto[funcName](parameters);
 			if(result !== undefined)
 				return result;
@@ -96,7 +96,7 @@ searchAfterFunction = function(protos, funcName, parameters) {
 
 //gör om så skickar in de två objekten och se om addition av obj2 till obj1 leder till circular (slippa flera if satser)
 //ÄNDRA NAMN
-searchAfterObject = function(protos, searchedObject) {
+searchAfterPrototype = function(protos, searchedObject) {
 
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
@@ -105,7 +105,7 @@ searchAfterObject = function(protos, searchedObject) {
 			return true;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = searchAfterObject(currentProto.getPrototypes(), searchedObject);
+				var result = searchAfterPrototype(currentProto.getPrototypes(), searchedObject);
 				if(result === true)
 					return result; 
 			}
