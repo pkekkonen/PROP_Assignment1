@@ -3,11 +3,12 @@
 
 //QUESTIONS: 
 //  -  Regarding circular prevention: "The last line above should generate an error, since it would cause circular inheritance."
-//     så ska addPrototype anrop som leder till cirkulärt beteende generera ett fel (och på vilket sätt). För som det är just nu så tillåts man bara inte göra det men det uppstår inget "Error"
+//     så ska addPrototype anrop som leder till cirkulärt beteende generera ett fel (och på vilket sätt). För som det är just nu 
+//     så tillåts man bara inte göra det men det uppstår inget "Error"
   
 
 createClass = function(className, superClassList) {
-	var newClass = {}; // men också class
+	var newClass = {};
 	newClass.className = className;
 	newClass.isClass = true;
 
@@ -27,8 +28,10 @@ createClass = function(className, superClassList) {
 				var tempList = this.getSuperClassList();
 				tempList.push(classToAdd); 
 				setSuperClassList(this, tempList); 
-			} 
+			}
+			throw "Cannot add " + classToAdd.className +" as a superclass since it will cause circular inheritance.";
 		}
+		throw "Not adding  " + classToAdd.className+ " as a superclass since it already is.";
 	}
 
 	newClass.new = function() {
@@ -40,8 +43,13 @@ createClass = function(className, superClassList) {
 				return this[funcName](parameters);
 		 	if(this.class.hasOwnProperty(funcName))
 				return this.class[funcName](parameters);
-			return searchAfterFunction(this.class.getSuperClassList(), funcName, parameters);
-		}	
+			var result = searchAfterFunction(this.class.getSuperClassList(), funcName, parameters);
+			if (result != undefined){
+				return result;
+			}
+			throw "Cannot find function"
+		}
+		
 		return obj;
 	}
 
