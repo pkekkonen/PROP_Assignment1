@@ -1,15 +1,13 @@
 // https://ilearn2.dsv.su.se/mod/forum/discuss.php?d=45930
-// ^ ang. den förvirrande meningen i uppgiftsbeskr.
 
 
 //QUESTIONS: 
 //  -  Regarding circular prevention: "The last line above should generate an error, since it would cause circular inheritance."
 //     så ska addPrototype anrop som leder till cirkulärt beteende generera ett fel (och på vilket sätt). För som det är just nu så tillåts man bara inte göra det men det uppstår inget "Error"
   
-var templateClass = {};
 
 createClass = function(className, superClassList) {
-	var newClass = Object.create(templateClass); // men också class
+	var newClass = {}; // men också class
 	newClass.className = className;
 	newClass.isClass = true;
 
@@ -21,40 +19,39 @@ createClass = function(className, superClassList) {
 		}
 	}
 
+	//Gör vackrare
 	newClass.addSuperClass = function(classToAdd) {
 		if(!classToAdd.hasOwnProperty("isClass"))
 			return;
 		if(!searchAfterSuperClass(this.getSuperClassList(), classToAdd.className)) {
-					console.log("HÄR1 : " + classToAdd.className)
-
 			if(!searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) {
-						console.log("HÄR2 : " + classToAdd.className)
 
 				var tempList = this.getSuperClassList();
-				tempList.push(classToAdd); //viktigt att skapa tempList snarare än skicka direkt
+				tempList.push(classToAdd); //viktigt att skapa tempList snarare än skicka direkt då metoden push inte retunerar nya listan utan värdet man skickar in
 				setSuperClassList(this, tempList); 
 			} 
 		}
+	}
+
+	newClass.new = function() {
+		var obj = {};
+		obj.class = this;
+
+//ska vara instansobjekten som har detta, inte klasserna
+		obj.call = function(funcName, parameters) {
+			if(this.hasOwnProperty(funcName))  //ska inte använda proto utan kolla vilken dess klass är?
+				return this[funcName](parameters);
+		 	if(this.class.hasOwnProperty(funcName))
+				return this.class[funcName](parameters);
+			return searchAfterFunction(this.class.getSuperClassList(), funcName, parameters);
+		}	
+		return obj;
 	}
 
 	setSuperClassList(newClass, superClassList);
 	return newClass;
 }
 
-templateClass.new = function() {
-	var obj = {};
-	obj.class = this;
-
-//ska vara instansobjekten som har detta, inte klasserna
-	obj.call = function(funcName, parameters) {
-		if(this.hasOwnProperty(funcName))  //ska inte använda proto utan kolla vilken dess klass är?
-			return this[funcName](parameters);
-		 if(this.class.hasOwnProperty(funcName))
-			return this.class[funcName](parameters);
-		return searchAfterFunction(this.class.getSuperClassList(), funcName, parameters);
-	}	
-	return obj;
-}
 
 searchAfterFunction = function(superClassList, funcName, parameters) {
 	for(var i = 0; i < superClassList.length; i++){
@@ -77,9 +74,7 @@ searchAfterSuperClass = function(superClassList, searchedClassName) {
 
 	for(var i = 0; i < superClassList.length; i++) {
 		var currentClass = superClassList[i];
-		console.log(searchedClassName + "    " + currentClass.className)
 		if(currentClass.className === searchedClassName) {
-			console.log("HHEJ  + " + searchedClassName + "    " + currentClass.className)
 			return true;
 		} else {
 		var result = searchAfterSuperClass(currentClass.getSuperClassList(), searchedClassName);
@@ -93,10 +88,34 @@ searchAfterSuperClass = function(superClassList, searchedClassName) {
 
 
 //TESTKOD
+var class0 = createClass("Class0", null);
+class0.func = function(arg) { return "func0: " + arg; };
+var class1 = createClass("Class1", [class0]);
+var class2 = createClass("Class2", []);
+class2.func = function(arg) { return "func2: " + arg; };
+var class3 = createClass("Class3", [class1, class2]);
+var obj3 = class3.new();
+var result = obj3.call("func", ["hello"]);
+console.log(result)
+
+class0 = createClass("Class0", null);
+class0.func = function(arg) { return "func0: " + arg; };
+class1 = createClass("Class1", [class0]);
+class2 = createClass("Class2", []);
+class3 = createClass("Class3", [class2, class1]);
+obj3 = class3.new();
+result = obj3.call("func", ["hello"]);
+console.log(result)
+
+class0 = createClass("Class0", null);
+class0.func = function(arg) { return "func0: " + arg; };
+var obj0 = class0.new();
+result = obj0.call("func", ["hello"]);
+console.log(result)
 
 
 //where ’result’ is assigned ’func0: hello’.
-
+console.log("_----------------------------------------------------------------")
 
 //Testkod cirkulär-del
 console.log("\n\n\nCircular part \n");
