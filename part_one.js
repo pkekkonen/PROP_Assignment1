@@ -17,65 +17,57 @@
 //To get a grade A or B you must detect such circular inheritance to avoid infinite loops in your search for a matching function. "
 //( ^ enl. Peter)
 
-//tror vi  har tänkt fel ang. prototyperna. Tror att vi (möjligtvis jag ...) förvirrat till det för oss själva.
-//tror att vårat sätt (det sätt beskrivet av uppgiften) ska ersätta det existerande sättet, dvs. den existerande implemenatationen av prototyper
-// Object ska också ligga som proto i vår lista?
 
 
-//create own kind of collection 
+
+
+//Questions:
+// - vad ska denna returna om inte function finns?
+// - måste vi kolla att parametrarna stämmer (antalsmässigt etc)
+// - Måste kolla att det faktiskt är en funktion som vi kan anropa
 var myObject = {};
-var count = 0;
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
 	obj.hasPrototypes = true;
-	// se till att kolla att inte null 
-	//och undefined? nej kan väl inte vara
 
-	obj.getPrototypes = function() {};
-
-	//var gör att denna bara är definierad här (lokalt)
 	var setPrototypes = function(objToSet, prototypes) {
 		objToSet.getPrototypes = function() {
 			return (prototypes != null? prototypes : []);
 		}
 	}
 
-	//kolla att man inte försöker lägga till en prototyp till sig själv
 	obj.addPrototype = function(objToAdd) {
 
+		if(this === objToAdd)
+			throw "Cannot add object as prototype to itself.";
 		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
 			if((!objToAdd.hasOwnProperty("hasPrototypes")) ||(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterObject(objToAdd.getPrototypes(), this) === false))) {
 				var tempList = this.getPrototypes();
 				tempList.push(objToAdd); //viktigt att skapa tempList snarare än skicka direkt
-
 				setPrototypes(this, tempList);
-
 			}
+		} else {
+			throw "Cannot add this object as a prototype since it will cause circular inheritance.";
 		}
 	}
 	 
 	setPrototypes(obj, prototypeList);
 	return obj;
-
-
 }
 
-//utför kontroll av att det inte kommer leda till ett cirkulärt förhållande
-//kolla om obj redan finns i kedjan av prototyper?
 
-
-//vad ska denna returna om inte function finns?
-//måste vi kolla att parametrarna stämmer (antalsmässigt etc)
 myObject.call = function(funcName, parameters) {
 
 	if(this.hasOwnProperty(funcName)) 
 		return this[funcName](parameters);
 
-	return searchAfterFunction(this.getPrototypes() ,funcName, parameters);
+	var result = searchAfterFunction(this.getPrototypes() ,funcName, parameters);
+	if(result === undefined)
+		throw "Could not find function.";
+	return result;
 };
 
-//TODO: måste vi kolla om parametrarna stämmer? Antar nej?
 searchAfterFunction = function(protos, funcName, parameters) {
 
 	for(var i = 0; i < protos.length; i++) {
@@ -111,7 +103,7 @@ searchAfterObject = function(protos, searchedObject) {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
 				var result = searchAfterObject(currentProto.getPrototypes(), searchedObject);
 				if(result === true)
-					return result; //om det är falskt så vill vi fortsätta leta efter
+					return result; 
 			}
 
 		}
@@ -221,18 +213,26 @@ var o2 = {name: "o2"}
 var o3 = {name: "o3"}
 var o4 = myObject.create([o2, o1]);
 o4.name = "o4"
+try {
 o1.addPrototype(o4);
 o1.addPrototype(o2);
 o4.addPrototype(o2);
 o4.addPrototype(o3);
+o4.addPrototype(o4);
+} catch(e) {
+	console.error(e);
+}
 
 console.log("\n\nO1 längd : (ska vara 1 ) " + o1.getPrototypes().length + "\n")
 
 for(var i = 0; i < o1.getPrototypes().length; i ++) {
 	console.log("Element  " + i + " : " + o1.getPrototypes()[i].name);
 }
-
+try {
 o4.addPrototype(o1);
+} catch(e) {
+	console.error(e);
+}
 console.log("\n\nO4 längd : (ska vara 3 ) " + o4.getPrototypes().length + "\n")
 
 for(var i = 0; i < o4.getPrototypes().length; i ++) {

@@ -11,8 +11,6 @@ createClass = function(className, superClassList) {
 	newClass.className = className;
 	newClass.isClass = true;
 
-	//newClass.getSuperClassList = function() {};
-
 	var setSuperClassList = function(classToSet, superClassList) {
 		classToSet.getSuperClassList = function() {
 			return (superClassList != null? superClassList: []);
@@ -22,12 +20,12 @@ createClass = function(className, superClassList) {
 	//Gör vackrare
 	newClass.addSuperClass = function(classToAdd) {
 		if(!classToAdd.hasOwnProperty("isClass"))
-			return;
+			throw "Cannot add class as superclass to itself.";
 		if(!searchAfterSuperClass(this.getSuperClassList(), classToAdd.className)) {
 			if(!searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) {
 
 				var tempList = this.getSuperClassList();
-				tempList.push(classToAdd); //viktigt att skapa tempList snarare än skicka direkt då metoden push inte retunerar nya listan utan värdet man skickar in
+				tempList.push(classToAdd); 
 				setSuperClassList(this, tempList); 
 			} 
 		}
@@ -37,9 +35,8 @@ createClass = function(className, superClassList) {
 		var obj = {};
 		obj.class = this;
 
-//ska vara instansobjekten som har detta, inte klasserna
 		obj.call = function(funcName, parameters) {
-			if(this.hasOwnProperty(funcName))  //ska inte använda proto utan kolla vilken dess klass är?
+			if(this.hasOwnProperty(funcName)) 
 				return this[funcName](parameters);
 		 	if(this.class.hasOwnProperty(funcName))
 				return this.class[funcName](parameters);
@@ -86,7 +83,6 @@ searchAfterSuperClass = function(superClassList, searchedClassName) {
 }
 
 
-
 //TESTKOD
 var class0 = createClass("Class0", null);
 class0.func = function(arg) { return "func0: " + arg; };
@@ -126,11 +122,16 @@ var class2 = createClass("Class2", [class3]);
 var class4 = createClass("Class4", [class2]);
 var class5 = createClass("Class5", [class0, class1, class2, class4]);
 var class6 = createClass("Class6", [class0, class1]);
-class3.addSuperClass(class5);
-class3.addSuperClass(class1);
-class3.addSuperClass(class1);
-class3.addSuperClass(class0);
-class3.addSuperClass(class6);
+try {
+	class3.addSuperClass(class5);
+	class3.addSuperClass(class1);
+	class3.addSuperClass(class1);
+	class3.addSuperClass(class0);
+	class3.addSuperClass(class6);
+	class3.addSuperClass(class3);
+} catch (e) {
+	console.error(e);
+}
 
 console.log("class 3 längd (ska vara 4): " + class3.getSuperClassList().length);
 console.log("class 4 längd (ska vara 1): " + class4.getSuperClassList().length);
