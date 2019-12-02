@@ -41,14 +41,17 @@ myObject.create = function(prototypeList) {
 
 		if(this === objToAdd)
 			throw "Cannot add object as prototype to itself.";
-		if(searchAfterObject(this.getPrototypes(), objToAdd) === false) {
-			if((!objToAdd.hasOwnProperty("hasPrototypes")) ||(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterObject(objToAdd.getPrototypes(), this) === false))) {
-				var tempList = this.getPrototypes();
-				tempList.push(objToAdd); //viktigt att skapa tempList snarare än skicka direkt
-				setPrototypes(this, tempList);
-			}
-		} else {
-			throw "Cannot add this object as a prototype since it will cause circular inheritance.";
+
+		else if(searchAfterObject(this.getPrototypes(), objToAdd)) 
+			throw "Cannot add an already existing prototype as a prototype."
+
+		else if(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterObject(objToAdd.getPrototypes(), this)))
+			throw "Addition of this object as a prototype will cause circular inheritance.";
+
+		else {
+			var tempList = this.getPrototypes();
+			tempList.push(objToAdd); 
+			setPrototypes(this, tempList);
 		}
 	}
 	 
@@ -92,6 +95,7 @@ searchAfterFunction = function(protos, funcName, parameters) {
 }
 
 //gör om så skickar in de två objekten och se om addition av obj2 till obj1 leder till circular (slippa flera if satser)
+//ÄNDRA NAMN
 searchAfterObject = function(protos, searchedObject) {
 
 	for(var i = 0; i < protos.length; i++) {
@@ -238,21 +242,5 @@ console.log("\n\nO4 längd : (ska vara 3 ) " + o4.getPrototypes().length + "\n")
 for(var i = 0; i < o4.getPrototypes().length; i ++) {
 	console.log("Element  " + i + " : " + o4.getPrototypes()[i].name);
 }
-//Test 
-//obj9 = {};
-//obj9.funcy = function() {console.log("hallå");};
-
-//obj0 = myObject.create([obj9]);
-//obj1 = {};
-//obj1.func = function() {console.log("heeeej");};
-//obj2 = obj0.create([obj0]);
-//obj2.call("funcy", []);
-
-
-
-
-
-
-
 
 
