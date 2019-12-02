@@ -95,7 +95,7 @@ searchAfterFunction = function(protos, funcName, parameters) {
 }
 
 //gör om så skickar in de två objekten och se om addition av obj2 till obj1 leder till circular (slippa flera if satser)
-//ÄNDRA NAMN
+//ÄNDRA NAMN?
 searchAfterPrototype = function(protos, searchedObject) {
 
 	for(var i = 0; i < protos.length; i++) {
