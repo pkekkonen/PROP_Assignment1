@@ -86,7 +86,7 @@ searchAfterPrototype = function(protos, searchedObject) {
 			return true;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = searchAfterPrototype(currentProto.getPrototypes, searchedObject);
+				var result = searchAfterPrototype(currentProto.getPrototypes(), searchedObject);
 				if(result === true)
 					return result; 
 			}
