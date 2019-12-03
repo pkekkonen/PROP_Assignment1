@@ -59,7 +59,6 @@ searchAfterFunction = function(protos, funcName, parameters) {
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
 			var result = currentProto[funcName](parameters);
 			if(result !== undefined)  //Nödvändig?
-				console.log("hej   "+result);
 				return result;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
@@ -99,15 +98,16 @@ searchAfterPrototype = function(protos, searchedObject) {
 var obj0 = myObject.create(null);
 var obj1 = myObject.create([obj0]);
 var obj2 = myObject.create([]);
-obj2.func = function(arg) { return "func2: " + arg; };
 var obj3 = myObject.create([obj1]);
-obj3.prototypes.push(obj2);
+var obj4 = myObject.create([obj2]);
+obj2.func = function(arg) { return "func2: " + arg; };
+obj3.addPrototype(obj4);
 obj0.name = "obj0";
 obj1.name = "obj1";
 obj2.name = "obj2";
 obj3.name = "obj3";
 var result = obj3.call("func", ["hello"]) ;
-console.log("should print ’func0: hello’ ->", result);
+console.log("should print ’func2: hello’ ->", result);
 
 
 
