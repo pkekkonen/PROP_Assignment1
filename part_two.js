@@ -6,27 +6,35 @@ createClass = function(className, superClassList) {
 	newClass.className = className;
 	newClass.isClass = true;
 
-	var setSuperClassList = function(classToSet, superClassList) {
-		classToSet.getSuperClassList = function() {
-			return (superClassList != null? superClassList: []);
-		}
+	var superClasses = (superClassList != null? superClassList : []);
+	Object.defineProperty(newClass, "superClasses", { 
+		get : function() { 
+				var newArray = superClasses.slice();
+				return newArray;},
+		set : function(classToAdd) { 
+
+		if(!classToAdd.hasOwnProperty("isClass")){
+			throw "This parameter is not a class.";
+		} else if(newClass === classToAdd) {
+			throw "Cannot add class as superclass to itself.";	
+		} else if(searchAfterSuperClass(newClass.superClasses, classToAdd.className)) {
+			throw "Not adding  " + classToAdd.className+ " as a superclass since it already is.";
+			
+		} else if(searchAfterSuperClass(classToAdd.superClasses, newClass.className)) {
+			throw "Cannot add " + classToAdd.className +" as a superclass since it will cause circular inheritance.";
+		} else {
+			superClasses.push(classToAdd);
+		}}
+
+	});
+
+	newClass.getSuperClassList = function() {
+		var newArray = this.superClasses.slice();
+		return newArray;
 	}
 
 	newClass.addSuperClass = function(classToAdd) {
-		if(!classToAdd.hasOwnProperty("isClass")){
-			throw "This parameter is not a class.";
-		} else if(this === classToAdd) {
-			throw "Cannot add class as superclass to itself.";	
-		} else if(searchAfterSuperClass(this.getSuperClassList(), classToAdd.className)) {
-			throw "Not adding  " + classToAdd.className+ " as a superclass since it already is.";
-			
-		} else if(searchAfterSuperClass(classToAdd.getSuperClassList(), this.className)) {
-			throw "Cannot add " + classToAdd.className +" as a superclass since it will cause circular inheritance.";
-		} else {
-			var tempList = this.getSuperClassList();
-			tempList.push(classToAdd); 
-			setSuperClassList(this, tempList); 
-		}
+		this.superClasses = (classToAdd);
 	}
 
 	newClass.new = function() {
@@ -48,7 +56,6 @@ createClass = function(className, superClassList) {
 		return obj;
 	}
 
-	setSuperClassList(newClass, superClassList);
 	return newClass;
 }
 
@@ -80,7 +87,41 @@ searchAfterSuperClass = function(superClassList, searchedClassName) {
 		var result = searchAfterSuperClass(currentClass.getSuperClassList(), searchedClassName);
 		if(result === true) 
 			return result;
-	}
+		}
 	}
 	return false;
 }
+
+
+var class0 = createClass("Class0", null);
+var class1 = createClass("Class1", null);
+var class2 = createClass("Class2", null);
+var class3 = createClass("Class3", null);
+var class4 = createClass("Class4", [class0, class1, class2]);
+
+console.log(class4.getSuperClassList())
+
+p = class4.getSuperClassList();
+
+
+console.log(p)
+p.push(class3);
+class4.superClasses.push(class3)
+
+console.log(class4.superClasses)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
