@@ -54,7 +54,6 @@ myObject.call = function(funcName, parameters) {
 searchAfterFunction = function(protos, funcName, parameters) {
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
-		console.log(currentProto);
 
 		if(currentProto.hasOwnProperty(funcName)) {
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
@@ -64,9 +63,8 @@ searchAfterFunction = function(protos, funcName, parameters) {
 				return result;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = searchAfterFunction(currentProto.getPrototypes, funcName, parameters);
+				var result = searchAfterFunction(currentProto.getPrototypes(), funcName, parameters);
 				if(result !== undefined) {
-					console.log("hej2   "+result);
 					return result;
 				}
 			}
@@ -104,6 +102,21 @@ obj0.func = function(arg) { return "func0: " + arg; };
 var obj1 = myObject.create([obj0]);
 var obj2 = myObject.create([]);
 obj2.func = function(arg) { return "func2: " + arg; };
-var obj3 = myObject.create([obj1, obj2]);
+var obj3 = myObject.create([obj1]);
+obj3.prototypes.push(obj2);
+obj0.name = "obj0";
+obj1.name = "obj1";
+obj2.name = "obj2";
+obj3.name = "obj3";
 var result = obj3.call("func", ["hello"]) ;
 console.log("should print ’func0: hello’ ->", result);
+
+
+
+
+
+
+
+
+
+
