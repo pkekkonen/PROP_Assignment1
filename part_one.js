@@ -6,32 +6,36 @@ var myObject = {};
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
 	obj.hasPrototypes = true;
-
-	var setPrototypes = function(objToSet, prototypes) {
-		objToSet.getPrototypes = function() {
-			return (prototypes != null? prototypes : []);
+	var prototypes = (prototypeList != null? prototypeList : []);
+	Object.defineProperty(obj, "prototypes", {
+		get : function(){
+			var copyPrototypes = prototypes.slice();
+			return copyPrototypes;
+		},
+		
+		set : function(objToAdd){
+			if(obj === objToAdd){
+				throw "Cannot add object as prototype to itself.";
+			} else if (searchAfterPrototype(obj.prototypes, objToAdd)) {
+				throw "Cannot add an already existing prototype as a prototype.";
+			} else if (searchAfterPrototype(objToAdd.prototypes, obj)){
+				throw "Addition of this object as a prototype will cause circular inheritance.";
+			} else {
+				prototypes.push(objToAdd);
+			}
 		}
-	}
+		
+	});
+
+	obj.getPrototypes = function() {
+		var copyPrototypes = prototypes.slice();
+			return copyPrototypes;
+		}
 
 	obj.addPrototype = function(objToAdd) {
-
-		if(this === objToAdd)
-			throw "Cannot add object as prototype to itself.";
-
-		else if(searchAfterPrototype(this.getPrototypes(), objToAdd)) 
-			throw "Cannot add an already existing prototype as a prototype."
-
-		else if(objToAdd.hasOwnProperty("hasPrototypes") && (searchAfterPrototype(objToAdd.getPrototypes(), this)))
-			throw "Addition of this object as a prototype will cause circular inheritance.";
-
-		else {
-			var tempList = this.getPrototypes();
-			tempList.push(objToAdd); 
-			setPrototypes(this, tempList);
-		}
+		set(objToAdd);
 	}
 	 
-	setPrototypes(obj, prototypeList);
 	return obj;
 }
 
@@ -41,26 +45,28 @@ myObject.call = function(funcName, parameters) {
 	if(this.hasOwnProperty(funcName)) 
 		return this[funcName](parameters);
 
-	var result = searchAfterFunction(this.getPrototypes() ,funcName, parameters);
+	var result = searchAfterFunction(this.getPrototypes(), funcName, parameters);
 	if(result === undefined)
 		throw "Could not find function.";
 	return result;
 };
 
 searchAfterFunction = function(protos, funcName, parameters) {
-
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
+		console.log(currentProto);
 
-		if(currentProto.hasOwnProperty(funcName)) { 
+		if(currentProto.hasOwnProperty(funcName)) {
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
 			var result = currentProto[funcName](parameters);
-			if(result !== undefined)
+			if(result !== undefined)  //Nödvändig?
+				console.log("hej   "+result);
 				return result;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = searchAfterFunction(currentProto.getPrototypes(), funcName, parameters);
+				var result = searchAfterFunction(currentProto.getPrototypes, funcName, parameters);
 				if(result !== undefined) {
+					console.log("hej2   "+result);
 					return result;
 				}
 			}
@@ -80,7 +86,7 @@ searchAfterPrototype = function(protos, searchedObject) {
 			return true;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = searchAfterPrototype(currentProto.getPrototypes(), searchedObject);
+				var result = searchAfterPrototype(currentProto.getPrototypes, searchedObject);
 				if(result === true)
 					return result; 
 			}
@@ -89,3 +95,15 @@ searchAfterPrototype = function(protos, searchedObject) {
 	}
 	return false;
 }
+
+
+//TESTKOD
+
+var obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+var obj1 = myObject.create([obj0]);
+var obj2 = myObject.create([]);
+obj2.func = function(arg) { return "func2: " + arg; };
+var obj3 = myObject.create([obj1, obj2]);
+var result = obj3.call("func", ["hello"]) ;
+console.log("should print ’func0: hello’ ->", result);
