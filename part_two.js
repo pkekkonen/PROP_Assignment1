@@ -30,8 +30,7 @@ createClass = function(className, superClassList) {
 	});
 
 	newClass.getSuperClassList = function() {
-		var newArray = this.superClasses.slice();
-		return newArray;
+		return this.superClasses; //behöver inte skicka kopia
 	}
 
 	newClass.addSuperClass = function(classToAdd) {
@@ -94,5 +93,25 @@ searchAfterSuperClass = function(superClassList, searchedClassName) {
 	}
 	return false;
 }
+
+
+var class0 = createClass("c0", null);
+var class1 = createClass("c1", null);
+var class2 = createClass("c2", [class0, class1]);
+var class3 = createClass("c3", null);
+
+class2.getSuperClassList().push(class3);
+
+console.log(class2.getSuperClassList())
+console.log(class2.superClasses)
+
+class2.superClasses.push(class3);
+
+console.log(class2.getSuperClassList())
+console.log(class2.superClasses)
+
+
+
+
 
 

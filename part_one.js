@@ -28,9 +28,8 @@ myObject.create = function(prototypeList) {
 	});
 
 	obj.getPrototypes = function() {
-		var copyPrototypes = prototypes.slice();
-			return copyPrototypes;
-		}
+		return obj.prototypes;
+	}
 
 	obj.addPrototype = function(objToAdd) {
 		this.prototypes = (objToAdd);
@@ -55,10 +54,10 @@ searchAfterFunction = function(protos, funcName, parameters) {
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
 
-		if(currentProto.hasOwnProperty(funcName)) {
+		if(currentProto.hasOwnProperty(funcName) && (typeOf(currentProto.funcName) === 'function')) {
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
 			var result = currentProto[funcName](parameters);
-			if(result !== undefined)  //Nödvändig?
+			if(result !== undefined)  //Nödvändig? Vad händer om en funktion faktiskt retunerar värdet undefined, kanske snarare borde definiera någon sorts konstant som är väldigt specifik för denna metod
 				return result;
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
@@ -70,10 +69,9 @@ searchAfterFunction = function(protos, funcName, parameters) {
 
 		}
 	}
-	return undefined;
+	return undefined; //returnera något annat ?
 }
 
-//Ändra namn?
 searchAfterPrototype = function(protos, searchedObject) {
 
 	for(var i = 0; i < protos.length; i++) {
@@ -109,5 +107,14 @@ obj3.name = "obj3";
 var result = obj3.call("func", ["hello"]) ;
 console.log("should print ’func2: hello’ ->", result);
 
+console.log("--------------")
+
+var obj5 = myObject.create(null);
+
+obj4.prototypes.push(obj5);
+obj4.getPrototypes().push(obj5);
+
+console.log(obj4.prototypes)
+console.log(obj4.getPrototypes())
 
 
