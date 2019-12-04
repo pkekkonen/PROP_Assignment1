@@ -57,11 +57,12 @@ searchAfterFunction = function(protos, funcName, parameters) {
 		var currentProto = protos[i];
 
 		if(currentProto.hasOwnProperty(funcName)) {
-			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
-			//problemet är att vi inte bara kan kolla om funcname är en funktion, måste kolla att det är en funktion för just det objektet vi är i
-			functionFound = true;
-			return currentProto[funcName](parameters);
-
+			if((typeof currentProto[funcName] === "function")) {
+				//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
+				//problemet är att vi inte bara kan kolla om funcname är en funktion, måste kolla att det är en funktion för just det objektet vi är i
+				functionFound = true;
+				return currentProto[funcName](parameters);
+			}
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
 				var result = searchAfterFunction(currentProto.getPrototypes(), funcName, parameters);
@@ -73,6 +74,10 @@ searchAfterFunction = function(protos, funcName, parameters) {
 		}
 	}
 	return undefined; //returnera något annat ?
+}
+
+function isFunction(functionToCheck) {
+ return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
 
 searchAfterPrototype = function(protos, searchedObject) {
