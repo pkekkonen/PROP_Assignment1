@@ -2,6 +2,7 @@
 // Paulina Lagebjer Kekkonen (pala7490) and Ida Söderberg (idso0102)
 
 var myObject = {};
+var functionFound = false; //hur göra så denna inte global?
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
@@ -39,14 +40,15 @@ myObject.create = function(prototypeList) {
 }
 
 
-myObject.call = function(funcName, parameters) {
-
+myObject.call = function(funcName, parameters) { 
 	if(this.hasOwnProperty(funcName)) 
 		return this[funcName](parameters);
 
 	var result = searchAfterFunction(this.getPrototypes(), funcName, parameters);
-	if(result === undefined)
+	if(result === undefined && !functionFound)
 		throw "Could not find function.";
+
+	functionFound = false;
 	return result;
 };
 
@@ -54,15 +56,16 @@ searchAfterFunction = function(protos, funcName, parameters) {
 	for(var i = 0; i < protos.length; i++) {
 		var currentProto = protos[i];
 
-		if(currentProto.hasOwnProperty(funcName) && (typeOf(currentProto.funcName) === 'function')) {
+		if(currentProto.hasOwnProperty(funcName)) {
 			//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
-			var result = currentProto[funcName](parameters);
-			if(result !== undefined)  //Nödvändig? Vad händer om en funktion faktiskt retunerar värdet undefined, kanske snarare borde definiera någon sorts konstant som är väldigt specifik för denna metod
-				return result;
+			//problemet är att vi inte bara kan kolla om funcname är en funktion, måste kolla att det är en funktion för just det objektet vi är i
+			functionFound = true;
+			return currentProto[funcName](parameters);
+
 		} else {
 			if(currentProto.hasOwnProperty("hasPrototypes")) {
 				var result = searchAfterFunction(currentProto.getPrototypes(), funcName, parameters);
-				if(result !== undefined) {
+				if(functionFound === true) { 
 					return result;
 				}
 			}
