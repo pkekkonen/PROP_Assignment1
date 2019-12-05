@@ -14,11 +14,11 @@ myObject.create = function(prototypeList) {
 		
 		set : function(objToAdd){
 			if(typeof objToAdd !== 'object') 
-				throw "Cannot add other than objects as prototypes."
+				throw new Error("Cannot add other than objects as prototypes.");
 			else if(obj === objToAdd)
-				throw "Cannot add object as prototype to itself.";
+				throw new Error("Cannot add object as prototype to itself.");
 			else if (doesListContainObject(objToAdd.prototypes, obj) || doesListContainObject(obj.prototypes, objToAdd))
-				throw "Addition of this object as a prototype will cause circular inheritance.";
+				throw new Error ("Addition of this object as a prototype will cause circular inheritance.");
 			else
 				prototypes.push(objToAdd);
 		}
@@ -45,13 +45,13 @@ myObject.call = function(funcName, parameters) {
 	var result = findPrototypeWithFunction(this.getPrototypes(), funcName);
 	
 	if(result === undefined)
-		throw "Could not find function.";
+		throw new Error("Could not find function.");
 
 	return result[funcName](parameters);
 };
 
 //namn?
-findPrototypeWithFunction(prototypes, funcName) {
+function findPrototypeWithFunction(prototypes, funcName) {
 	for(var i = 0; i < prototypes.length; i++) {
 		var currentProto = prototypes[i];
 
@@ -68,7 +68,7 @@ findPrototypeWithFunction(prototypes, funcName) {
 }
 
 //namn?
-doesListContainObject(prototypes, searchedObject) {
+function doesListContainObject(prototypes, searchedObject) {
 
 	for(var i = 0; i < prototypes.length; i++) {
 		var currentProto = prototypes[i];
@@ -118,6 +118,7 @@ obj0.func = function(arg) { return "func0: " + arg; };
 obj1 = myObject.create([obj0]);
 obj2 = myObject.create([]);
 obj3 = myObject.create([obj2, obj1]);
+obj1.addPrototype(obj3);									//ta bort denna rad om inte vill generera ett error
 result = obj3.call("func", ["hello"]);
 console.log("should print ’func0: hello’ ->", result);
 

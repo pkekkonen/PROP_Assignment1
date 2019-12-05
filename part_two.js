@@ -1,7 +1,7 @@
 
 // Paulina Lagebjer Kekkonen (pala7490) and Ida Söderberg (idso0102)
 
-createClass(className, superClassList) {
+function createClass(className, superClassList) {
 	var newClass = {};
 	Object.defineProperty(newClass, "className", {value: className, enumerable : true});
 	Object.defineProperty(newClass, "isClass", {value: true, enumerable : true});
@@ -13,11 +13,11 @@ createClass(className, superClassList) {
 			return superClasses.slice(); },
 		set (classToAdd) { 												//flytta till add? 
 			if(!classToAdd.hasOwnProperty("isClass"))
-				throw "This parameter is not a class.";
+				throw new Error("This parameter is not a class.");
 			else if(newClass === classToAdd) 
-				throw "Cannot add a class as superclass to itself.";	
+				throw new Error("Cannot add a class as superclass to itself.");	
 			else if(doesListContainClass(classToAdd.superClasses, newClass.className) || doesListContainClass(newClass.superClasses, classToAdd.className))
-				throw "Cannot add " + classToAdd.className + " as a superclass since it will cause circular inheritance.";
+				throw new Error("Cannot add " + classToAdd.className + " as a superclass since it will cause circular inheritance.");
 			else 
 				superClasses.push(classToAdd);
 		}
@@ -49,7 +49,7 @@ createClass(className, superClassList) {
 
 			var result = findClassWithFunction(this.ownClass.getSuperClassList(), funcName);
 			if (result === undefined)
-				throw "Cannot find the function."
+				throw new Error("Cannot find the function.");
 			return result[funcName](parameters);
 		}
 		
@@ -60,7 +60,7 @@ createClass(className, superClassList) {
 }
 
 //namn?
-findClassWithFunction(superClassList, funcName) {
+function findClassWithFunction(superClassList, funcName) {
 	for(var i = 0; i < superClassList.length; i++){
 
 		var currentSuperClass = superClassList[i];
@@ -75,7 +75,7 @@ findClassWithFunction(superClassList, funcName) {
 }
 
 //namn?
-doesListContainClass(superClassList, searchedClassName) {
+function doesListContainClass(superClassList, searchedClassName) {
 
 	for(var i = 0; i < superClassList.length; i++) {
 		var currentClass = superClassList[i];
