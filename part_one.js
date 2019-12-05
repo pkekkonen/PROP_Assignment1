@@ -30,7 +30,7 @@ myObject.create = function(prototypeList) {
 	}
 
 	obj.addPrototype = function(objToAdd) {
-		this.prototypes = (objToAdd);
+		this.prototypes = objToAdd;
 	}
 	 
 	return obj;
@@ -51,7 +51,7 @@ myObject.call = function(funcName, parameters) {
 };
 
 //namn?
-findPrototypeWithFunction = function(prototypes, funcName) {
+findPrototypeWithFunction(prototypes, funcName) {
 	for(var i = 0; i < prototypes.length; i++) {
 		var currentProto = prototypes[i];
 
@@ -68,7 +68,7 @@ findPrototypeWithFunction = function(prototypes, funcName) {
 }
 
 //namn?
-doesListContainObject = function(prototypes, searchedObject) {
+doesListContainObject(prototypes, searchedObject) {
 
 	for(var i = 0; i < prototypes.length; i++) {
 		var currentProto = prototypes[i];

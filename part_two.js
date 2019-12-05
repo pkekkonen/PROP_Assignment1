@@ -1,7 +1,7 @@
 
 // Paulina Lagebjer Kekkonen (pala7490) and Ida Söderberg (idso0102)
 
-createClass = function(className, superClassList) {
+createClass(className, superClassList) {
 	var newClass = {};
 	Object.defineProperty(newClass, "className", {value: className, enumerable : true});
 	Object.defineProperty(newClass, "isClass", {value: true, enumerable : true});
@@ -9,9 +9,9 @@ createClass = function(className, superClassList) {
 	var superClasses = (superClassList != null? superClassList : []);
 
 	Object.defineProperty(newClass, "superClasses", { 
-		get : function() { 
+		get () { 
 			return superClasses.slice(); },
-		set : function(classToAdd) { 												//flytta till add? 
+		set (classToAdd) { 												//flytta till add? 
 			if(!classToAdd.hasOwnProperty("isClass"))
 				throw "This parameter is not a class.";
 			else if(newClass === classToAdd) 
@@ -60,7 +60,7 @@ createClass = function(className, superClassList) {
 }
 
 //namn?
-findClassWithFunction = function(superClassList, funcName) {
+findClassWithFunction(superClassList, funcName) {
 	for(var i = 0; i < superClassList.length; i++){
 
 		var currentSuperClass = superClassList[i];
@@ -75,7 +75,7 @@ findClassWithFunction = function(superClassList, funcName) {
 }
 
 //namn?
-doesListContainClass = function(superClassList, searchedClassName) {
+doesListContainClass(superClassList, searchedClassName) {
 
 	for(var i = 0; i < superClassList.length; i++) {
 		var currentClass = superClassList[i];
