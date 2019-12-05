@@ -3,34 +3,29 @@
 
 createClass = function(className, superClassList) {
 	var newClass = {};
-	newClass.className = className;
-	newClass.isClass = true;
+	Object.defineProperty(newClass, "className", {value: className, enumerable : true});
+	Object.defineProperty(newClass, "isClass", {value: true, enumerable : true});
 
 	var superClasses = (superClassList != null? superClassList : []);
 
 	Object.defineProperty(newClass, "superClasses", { 
 		get : function() { 
-				var newArray = superClasses.slice();
-				return newArray; },
-		set : function(classToAdd) { 
-
-				if(!classToAdd.hasOwnProperty("isClass")){
-					throw "This parameter is not a class.";
-				} else if(newClass === classToAdd) {
-					throw "Cannot add class as superclass to itself.";	
-				} else if(searchAfterSuperClass(newClass.superClasses, classToAdd.className)) {
-					throw "Not adding  " + classToAdd.className + " as a superclass since it already is.";
-				
-				} else if(searchAfterSuperClass(classToAdd.superClasses, newClass.className)) {
-					throw "Cannot add " + classToAdd.className + " as a superclass since it will cause circular inheritance.";
-				} else {
-					superClasses.push(classToAdd);
-				}}
+			return superClasses.slice(); },
+		set : function(classToAdd) { 												//flytta till add? 
+			if(!classToAdd.hasOwnProperty("isClass"))
+				throw "This parameter is not a class.";
+			else if(newClass === classToAdd) 
+				throw "Cannot add a class as superclass to itself.";	
+			else if(doesListContainClass(classToAdd.superClasses, newClass.className) || doesListContainClass(newClass.superClasses, classToAdd.className))
+				throw "Cannot add " + classToAdd.className + " as a superclass since it will cause circular inheritance.";
+			else 
+				superClasses.push(classToAdd);
+		}
 
 	});
 
 	newClass.getSuperClassList = function() {
-		return this.superClasses; //behöver inte skicka kopia
+		return this.superClasses; 
 	}
 
 	newClass.addSuperClass = function(classToAdd) {
@@ -41,18 +36,21 @@ createClass = function(className, superClassList) {
 
 	newClass.new = function() {
 		var obj = {};
-		obj.class = this;
+		var ownClass = this; 																		//bättre namn än own class?
+		Object.defineProperty(obj, "ownClass", {value : ownClass, enumerable : true});
 
 		obj.call = function(funcName, parameters) {
-			if(this.hasOwnProperty(funcName)) 
+
+			if(this.hasOwnProperty(funcName) && (typeof(this[funcName]) === 'function')) 
 				return this[funcName](parameters);
-		 	if(this.class.hasOwnProperty(funcName))
-				return this.class[funcName](parameters);
-			var result = searchAfterFunction(this.class.getSuperClassList(), funcName, parameters);
-			if (result != undefined){
-				return result;
-			}
-			throw "Cannot find function"
+
+		 	if(this.ownClass.hasOwnProperty(funcName) && (typeof(this.ownClass[funcName]) === 'function'))
+				return (this.ownClass)[funcName](parameters);
+
+			var result = findClassWithFunction(this.ownClass.getSuperClassList(), funcName);
+			if (result === undefined)
+				throw "Cannot find the function."
+			return result[funcName](parameters);
 		}
 		
 		return obj;
@@ -61,34 +59,32 @@ createClass = function(className, superClassList) {
 	return newClass;
 }
 
-
-searchAfterFunction = function(superClassList, funcName, parameters) {
+//namn?
+findClassWithFunction = function(superClassList, funcName) {
 	for(var i = 0; i < superClassList.length; i++){
+
 		var currentSuperClass = superClassList[i];
-		if(currentSuperClass.hasOwnProperty(funcName)) {
-			var result = currentSuperClass[funcName](parameters);
-			if (result != undefined){
-				return result;
-			}
-		}
-		var result = searchAfterFunction(currentSuperClass.getSuperClassList(), funcName, parameters);
-		if(result !== undefined){
-			return result;
-		}
+		if(currentSuperClass.hasOwnProperty(funcName) && (typeof(currentSuperClass[funcName]) === 'function')) 
+			return currentSuperClass;
+
+		var result = findClassWithFunction(currentSuperClass.getSuperClassList(), funcName);
+		if(result !== undefined)
+			return result;		
 	}
 	return undefined;
 }
 
-searchAfterSuperClass = function(superClassList, searchedClassName) {
+//namn?
+doesListContainClass = function(superClassList, searchedClassName) {
 
 	for(var i = 0; i < superClassList.length; i++) {
 		var currentClass = superClassList[i];
-		if(currentClass.className === searchedClassName) {
+		if(currentClass.className === searchedClassName)
 			return true;
-		} else {
-		var result = searchAfterSuperClass(currentClass.getSuperClassList(), searchedClassName);
-		if(result === true) 
-			return result;
+		else {
+			var result = doesListContainClass(currentClass.getSuperClassList(), searchedClassName);
+			if(result === true) 
+				return result;
 		}
 	}
 	return false;
@@ -111,7 +107,32 @@ console.log(class2.getSuperClassList())
 console.log(class2.superClasses)
 
 
+//Given testkod
+console.log("-----------------------\n\n")
+var class0 = createClass("Class0", null);
+class0.func = function(arg) { return "func0: " + arg; };
+var class1 = createClass("Class1", [class0]);
+var class2 = createClass("Class2", []);
+class2.func = function(arg) { return "func2: " + arg; };
+var class3 = createClass("Class3", [class1, class2]);
+var obj3 = class3.new();
+var result = obj3.call("func", ["hello"]);
+console.log(result + "\n")
 
+class0 = createClass("Class0", null);
+class0.func = function(arg) { return "func0: " + arg; };
+class1 = createClass("Class1", [class0]);
+class2 = createClass("Class2", []);
+class3 = createClass("Class3", [class2, class1]);
+obj3 = class3.new();
+result = obj3.call("func", ["hello"]);
+console.log(result + "\n")
+
+class0 = createClass("Class0", null);
+class0.func = function(arg) { return "func0: " + arg; };
+var obj0 = class0.new();
+result = obj0.call("func", ["hello"]);
+console.log(result + "\n")
 
 
 

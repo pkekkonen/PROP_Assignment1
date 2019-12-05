@@ -2,28 +2,25 @@
 // Paulina Lagebjer Kekkonen (pala7490) and Ida Söderberg (idso0102)
 
 var myObject = {};
-var functionFound = false; //hur göra så denna inte global?
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
-	obj.hasPrototypes = true;
+	Object.defineProperty(obj, "hasPrototypes", { value: true, enumerable : true});
 	var prototypes = (prototypeList != null? prototypeList : []);
 	Object.defineProperty(obj, "prototypes", {
 		get : function(){
-			var copyPrototypes = prototypes.slice();
-			return copyPrototypes;
+			return prototypes.slice();
 		},
 		
 		set : function(objToAdd){
-			if(obj === objToAdd){
+			if(typeof objToAdd !== 'object') 
+				throw "Cannot add other than objects as prototypes."
+			else if(obj === objToAdd)
 				throw "Cannot add object as prototype to itself.";
-			} else if (searchAfterPrototype(obj.prototypes, objToAdd)) {
-				throw "Cannot add an already existing prototype as a prototype.";
-			} else if (searchAfterPrototype(objToAdd.prototypes, obj)){
+			else if (doesListContainObject(objToAdd.prototypes, obj) || doesListContainObject(obj.prototypes, objToAdd))
 				throw "Addition of this object as a prototype will cause circular inheritance.";
-			} else {
+			else
 				prototypes.push(objToAdd);
-			}
 		}
 		
 	});
@@ -41,59 +38,47 @@ myObject.create = function(prototypeList) {
 
 
 myObject.call = function(funcName, parameters) { 
-	if(this.hasOwnProperty(funcName)) 
+	
+	if(this.hasOwnProperty(funcName) && (typeof (this[funcName]) === 'function')) 
 		return this[funcName](parameters);
 
-	var result = searchAfterFunction(this.getPrototypes(), funcName, parameters);
-	if(result === undefined && !functionFound)
+	var result = findPrototypeWithFunction(this.getPrototypes(), funcName);
+	
+	if(result === undefined)
 		throw "Could not find function.";
 
-	functionFound = false;
-	return result;
+	return result[funcName](parameters);
 };
 
-searchAfterFunction = function(protos, funcName, parameters) {
-	for(var i = 0; i < protos.length; i++) {
-		var currentProto = protos[i];
+//namn?
+findPrototypeWithFunction = function(prototypes, funcName) {
+	for(var i = 0; i < prototypes.length; i++) {
+		var currentProto = prototypes[i];
 
-		if(currentProto.hasOwnProperty(funcName)) {
-			if((typeof currentProto[funcName] === "function")) {
-				//&& typeOf(currentProto.funcName) === 'function'. Måste kolla att det faktiskt är en funktion som vi kan anropa?
-				//problemet är att vi inte bara kan kolla om funcname är en funktion, måste kolla att det är en funktion för just det objektet vi är i
-				functionFound = true;
-				return currentProto[funcName](parameters);
-			}
-		} else {
-			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = searchAfterFunction(currentProto.getPrototypes(), funcName, parameters);
-				if(functionFound === true) { 
-					return result;
-				}
-			}
-
+		if(currentProto.hasOwnProperty(funcName) && (typeof currentProto[funcName] === 'function'))
+				return currentProto;
+		
+		if(currentProto.hasOwnProperty('hasPrototypes')) {
+			var result = findPrototypeWithFunction(currentProto.getPrototypes(), funcName);
+			if(result !== undefined)
+				return result;
 		}
 	}
-	return undefined; //returnera något annat ?
+	return undefined;
 }
 
-function isFunction(functionToCheck) {
- return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
-}
+//namn?
+doesListContainObject = function(prototypes, searchedObject) {
 
-searchAfterPrototype = function(protos, searchedObject) {
+	for(var i = 0; i < prototypes.length; i++) {
+		var currentProto = prototypes[i];
 
-	for(var i = 0; i < protos.length; i++) {
-		var currentProto = protos[i];
-
-		if(currentProto === searchedObject) { 
+		if(currentProto === searchedObject)
 			return true;
-		} else {
-			if(currentProto.hasOwnProperty("hasPrototypes")) {
-				var result = searchAfterPrototype(currentProto.getPrototypes(), searchedObject);
-				if(result === true)
-					return result; 
-			}
-
+		if(currentProto.hasOwnProperty('hasPrototypes')) {
+			var result = doesListContainObject(currentProto.getPrototypes(), searchedObject);
+			if(result === true)
+				return result; 
 		}
 	}
 	return false;
@@ -115,14 +100,28 @@ obj3.name = "obj3";
 var result = obj3.call("func", ["hello"]) ;
 console.log("should print ’func2: hello’ ->", result);
 
-console.log("--------------")
+console.log("--------------\n\n")
 
-var obj5 = myObject.create(null);
+//given testkod
+var obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+var obj1 = myObject.create([obj0]);
+var obj2 = myObject.create([]);
+obj2.func = function(arg) { return "func2: " + arg; };
+var obj3 = myObject.create([obj1, obj2]);
+var result = obj3.call("func", ["hello"]) ;
+console.log("should print ’func0: hello’ ->", result);
 
-obj4.prototypes.push(obj5);
-obj4.getPrototypes().push(obj5);
 
-console.log(obj4.prototypes)
-console.log(obj4.getPrototypes())
+obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+obj1 = myObject.create([obj0]);
+obj2 = myObject.create([]);
+obj3 = myObject.create([obj2, obj1]);
+result = obj3.call("func", ["hello"]);
+console.log("should print ’func0: hello’ ->", result);
 
-
+obj0 = myObject.create(null);
+obj0.func = function(arg) { return "func0: " + arg; };
+result = obj0.call("func", ["hello"]);
+console.log("should print ’func0: hello’ ->", result);
