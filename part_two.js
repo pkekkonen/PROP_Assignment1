@@ -4,14 +4,13 @@
 function createClass(className, superClassList) {
 	var newClass = {};
 	Object.defineProperty(newClass, "className", {value: className, enumerable : true});
-//	Object.defineProperty(newClass, "isClass", {value: true, enumerable : true});
 
 	var superClasses = (superClassList != null? superClassList : []);
 
 	Object.defineProperty(newClass, "superClasses", { 
 		get () { 
 			return superClasses.slice(); },
-		set (classToAdd) { 												//flytta till add? 
+		set (classToAdd) { 	
 			if(!classToAdd.hasOwnProperty("superClasses"))
 				throw new Error("This parameter is not a class.");
 			else if(newClass === classToAdd) 
@@ -31,12 +30,11 @@ function createClass(className, superClassList) {
 	newClass.addSuperClass = function(classToAdd) {
 		this.superClasses = classToAdd;
 
-
 	}
 
 	newClass.new = function() {
 		var obj = {};
-		var ownClass = this; 																		//bättre namn än ownClass?
+		var ownClass = this; 
 		Object.defineProperty(obj, "ownClass", {value : ownClass, enumerable : true});
 
 		obj.call = function(funcName, parameters) {
@@ -133,6 +131,3 @@ class0.func = function(arg) { return "func0: " + arg; };
 var obj0 = class0.new();
 result = obj0.call("func", ["hello"]);
 console.log(result + "\n")
-
-
-

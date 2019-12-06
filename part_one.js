@@ -5,7 +5,6 @@ var myObject = {};
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
-//	Object.defineProperty(obj, "hasPrototypes", { value: true, enumerable : true});
 	var prototypes = (prototypeList != null? prototypeList : []);
 	Object.defineProperty(obj, "prototypes", {
 		get : function(){
