@@ -4,7 +4,7 @@
 function createClass(className, superClassList) {
 	var newClass = {};
 	Object.defineProperty(newClass, "className", {value: className, enumerable : true});
-	Object.defineProperty(newClass, "isClass", {value: true, enumerable : true});
+//	Object.defineProperty(newClass, "isClass", {value: true, enumerable : true});
 
 	var superClasses = (superClassList != null? superClassList : []);
 
@@ -12,7 +12,7 @@ function createClass(className, superClassList) {
 		get () { 
 			return superClasses.slice(); },
 		set (classToAdd) { 												//flytta till add? 
-			if(!classToAdd.hasOwnProperty("isClass"))
+			if(!classToAdd.hasOwnProperty("superClasses"))
 				throw new Error("This parameter is not a class.");
 			else if(newClass === classToAdd) 
 				throw new Error("Cannot add a class as superclass to itself.");	
@@ -36,7 +36,7 @@ function createClass(className, superClassList) {
 
 	newClass.new = function() {
 		var obj = {};
-		var ownClass = this; 																		//bättre namn än own class?
+		var ownClass = this; 																		//bättre namn än ownClass?
 		Object.defineProperty(obj, "ownClass", {value : ownClass, enumerable : true});
 
 		obj.call = function(funcName, parameters) {
@@ -47,10 +47,10 @@ function createClass(className, superClassList) {
 		 	if(this.ownClass.hasOwnProperty(funcName) && (typeof(this.ownClass[funcName]) === 'function'))
 				return (this.ownClass)[funcName](parameters);
 
-			var result = findClassWithFunction(this.ownClass.getSuperClassList(), funcName);
-			if (result === undefined)
+			var classContainingFunc = findClassWithFunction(this.ownClass.getSuperClassList(), funcName);
+			if (classContainingFunc === undefined)
 				throw new Error("Cannot find the function.");
-			return result[funcName](parameters);
+			return classContainingFunc[funcName](parameters);
 		}
 		
 		return obj;

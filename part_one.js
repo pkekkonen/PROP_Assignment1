@@ -5,7 +5,7 @@ var myObject = {};
 
 myObject.create = function(prototypeList) {
 	var obj = Object.create(myObject);
-	Object.defineProperty(obj, "hasPrototypes", { value: true, enumerable : true});
+//	Object.defineProperty(obj, "hasPrototypes", { value: true, enumerable : true});
 	var prototypes = (prototypeList != null? prototypeList : []);
 	Object.defineProperty(obj, "prototypes", {
 		get : function(){
@@ -42,12 +42,12 @@ myObject.call = function(funcName, parameters) {
 	if(this.hasOwnProperty(funcName) && (typeof (this[funcName]) === 'function')) 
 		return this[funcName](parameters);
 
-	var result = findPrototypeWithFunction(this.getPrototypes(), funcName);
+	var prototypeContainingFunc = findPrototypeWithFunction(this.getPrototypes(), funcName);
 	
-	if(result === undefined)
-		throw new Error("Could not find function.");
+	if(prototypeContainingFunc === undefined)
+		throw new Error("Cannot find function.");
 
-	return result[funcName](parameters);
+	return prototypeContainingFunc[funcName](parameters);
 };
 
 //namn?
@@ -58,7 +58,7 @@ function findPrototypeWithFunction(prototypes, funcName) {
 		if(currentProto.hasOwnProperty(funcName) && (typeof currentProto[funcName] === 'function'))
 				return currentProto;
 		
-		if(currentProto.hasOwnProperty('hasPrototypes')) {
+		if(currentProto.hasOwnProperty('prototypes')) {
 			var result = findPrototypeWithFunction(currentProto.getPrototypes(), funcName);
 			if(result !== undefined)
 				return result;
@@ -75,7 +75,7 @@ function doesListContainObject(prototypes, searchedObject) {
 
 		if(currentProto === searchedObject)
 			return true;
-		if(currentProto.hasOwnProperty('hasPrototypes')) {
+		if(currentProto.hasOwnProperty('prototypes')) {
 			var result = doesListContainObject(currentProto.getPrototypes(), searchedObject);
 			if(result === true)
 				return result; 
@@ -118,7 +118,7 @@ obj0.func = function(arg) { return "func0: " + arg; };
 obj1 = myObject.create([obj0]);
 obj2 = myObject.create([]);
 obj3 = myObject.create([obj2, obj1]);
-obj1.addPrototype(obj3);									//ta bort denna rad om inte vill generera ett error
+//obj1.addPrototype(obj3);									//ta bort denna rad om inte vill generera ett error
 result = obj3.call("func", ["hello"]);
 console.log("should print ’func0: hello’ ->", result);
 
